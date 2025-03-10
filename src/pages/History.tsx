@@ -1,25 +1,31 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Layout from '@/components/Layout';
-import TemperatureHistory from '@/components/TemperatureHistory';
-import { 
-  ChildProfile as ChildProfileType, 
-  TemperatureReading
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
+import {
+  TemperatureReading,
+  ChildProfile as ChildProfileType,
+  getSeverity,
+  getAgeGroup
 } from '@/lib/feverGuide';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CalendarIcon, ChevronLeft, Download, FileDown, ListFilter } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
+import TemperatureHistory from '@/components/TemperatureHistory';
+import { slideUpAnimation } from '@/lib/animations';
 import { cn } from '@/lib/utils';
+import { Clock } from 'lucide-react';
 
 const History = () => {
   const [profiles, setProfiles] = useState<ChildProfileType[]>([]);
-  const [temperatures, setTemperatures] = useState<TemperatureReading[]>([]);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+  const [temperatures, setTemperatures] = useState<TemperatureReading[]>([]);
   
-  // On mount, load data from localStorage
-  useEffect(() => {
+  // On mount, check for saved profiles and temperatures
+  React.useEffect(() => {
     const savedProfiles = localStorage.getItem('feverFriend_profiles');
     const savedTemperatures = localStorage.getItem('feverFriend_temperatures');
     
@@ -57,131 +63,46 @@ const History = () => {
     }
   }, []);
   
-  const handleProfileChange = (profileId: string) => {
-    setSelectedProfileId(profileId);
-  };
-  
-  const handleExportData = () => {
-    if (!selectedProfileId) return;
-    
-    const selectedProfile = profiles.find(p => p.id === selectedProfileId);
-    if (!selectedProfile) return;
-    
-    const profileTemperatures = temperatures.filter(t => t.childId === selectedProfileId);
-    
-    const exportData = {
-      profile: selectedProfile,
-      temperatures: profileTemperatures
-    };
-    
-    // Convert to CSV format
-    const csvContent = [
-      ["Date", "Time", "Temperature", "Unit", "Symptoms", "Notes"].join(","),
-      ...profileTemperatures.map(t => [
-        format(t.timestamp, 'yyyy-MM-dd'),
-        format(t.timestamp, 'HH:mm'),
-        t.value.toString(),
-        t.unit,
-        t.symptoms.join(';'),
-        t.notes || ''
-      ].join(","))
-    ].join("\n");
-    
-    // Create and trigger download
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `${selectedProfile.name}_fever_history.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-  
   const selectedProfile = profiles.find(p => p.id === selectedProfileId);
   const profileTemperatures = temperatures.filter(t => t.childId === selectedProfileId);
   
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <Link to="/">
-            <Button variant="ghost" size="sm" className="gap-1">
-              <ChevronLeft className="h-4 w-4" /> Back
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-semibold">Temperature History</h1>
-          <div className="w-16" /> {/* Spacer for alignment */}
-        </div>
-        
-        {profiles.length > 0 ? (
-          <>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
-              <div className="w-full sm:w-64">
-                <Select value={selectedProfileId || ''} onValueChange={handleProfileChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a child" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {profiles.map(profile => (
-                      <SelectItem key={profile.id} value={profile.id}>
-                        {profile.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              {selectedProfile && profileTemperatures.length > 0 && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleExportData}
-                  className="gap-1"
-                >
-                  <FileDown className="h-4 w-4" />
-                  Export Data
-                </Button>
-              )}
-            </div>
-            
+        <Card className={cn("glass-morphism", slideUpAnimation(100))}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-primary" />
+              Temperature History
+            </CardTitle>
+            <CardDescription>
+              Complete history of recorded temperature readings
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent>
             {selectedProfile ? (
-              profileTemperatures.length > 0 ? (
-                <TemperatureHistory
-                  readings={profileTemperatures}
-                  childProfile={selectedProfile}
-                />
-              ) : (
-                <div className="text-center py-10">
-                  <CalendarIcon className="h-12 w-12 mx-auto text-muted-foreground opacity-30" />
-                  <p className="text-muted-foreground mt-2">
-                    No temperature history recorded for {selectedProfile.name} yet
+              <div className="space-y-4">
+                <h2 className="text-lg font-semibold">{selectedProfile?.name}'s History</h2>
+                
+                {profileTemperatures.length > 0 ? (
+                  <TemperatureHistory
+                    readings={profileTemperatures}
+                    childProfile={selectedProfile}
+                  />
+                ) : (
+                  <p className="text-muted-foreground text-center py-8">
+                    No temperature readings have been recorded yet.
                   </p>
-                  <Link to="/">
-                    <Button className="mt-4">
-                      Record a Temperature
-                    </Button>
-                  </Link>
-                </div>
-              )
-            ) : (
-              <div className="text-center py-10">
-                <p className="text-muted-foreground">Select a child to view their temperature history</p>
+                )}
               </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">
+                Please create a child profile on the home page first.
+              </p>
             )}
-          </>
-        ) : (
-          <div className="text-center py-10">
-            <p className="text-muted-foreground">
-              No child profiles found. Add a profile to start tracking temperatures.
-            </p>
-            <Link to="/">
-              <Button className="mt-4">
-                Add a Child Profile
-              </Button>
-            </Link>
-          </div>
-        )}
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );
