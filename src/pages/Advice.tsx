@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Layout from '@/components/Layout';
 import {
@@ -16,7 +15,7 @@ import {
 } from "@/components/ui/accordion";
 import { cn } from '@/lib/utils';
 import { slideUpAnimation } from '@/lib/animations';
-import { BookOpen, AlertTriangle, Thermometer, Pills, HelpCircle, Timer, Baby, Phone } from 'lucide-react';
+import { BookOpen, AlertTriangle, Thermometer, Pill, HelpCircle, Timer, Baby, Phone } from 'lucide-react';
 
 const Advice = () => {
   return (
@@ -74,7 +73,7 @@ const Advice = () => {
               
               <AccordionItem value="item-3">
                 <AccordionTrigger className="text-left font-medium flex">
-                  <Pills className="h-4 w-4 mr-2 text-primary" />
+                  <Pill className="h-4 w-4 mr-2 text-primary" />
                   Medication Guidelines
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">
