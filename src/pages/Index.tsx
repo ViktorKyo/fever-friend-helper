@@ -16,6 +16,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Thermometer } from 'lucide-react';
 
 const Index = () => {
+  console.log("Index page rendering");
+  
   const { toast } = useToast();
   const [profiles, setProfiles] = useState<ChildProfileType[]>([]);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
@@ -24,6 +26,7 @@ const Index = () => {
   
   // On mount, check for saved profiles
   useEffect(() => {
+    console.log("Index useEffect running");
     const savedProfiles = localStorage.getItem('feverFriend_profiles');
     const savedTemperatures = localStorage.getItem('feverFriend_temperatures');
     
@@ -36,6 +39,7 @@ const Index = () => {
           birthdate: new Date(profile.birthdate)
         }));
         setProfiles(processedProfiles);
+        console.log("Loaded profiles:", processedProfiles);
         
         // If profiles exist, select the first one
         if (processedProfiles.length > 0) {
@@ -55,6 +59,7 @@ const Index = () => {
           timestamp: new Date(temp.timestamp)
         }));
         setTemperatures(processedTemperatures);
+        console.log("Loaded temperatures:", processedTemperatures);
       } catch (e) {
         console.error('Error parsing saved temperatures', e);
       }
@@ -75,6 +80,7 @@ const Index = () => {
   }, [temperatures]);
   
   const handleProfileAdd = (profile: ChildProfileType) => {
+    console.log("Adding profile:", profile);
     setProfiles(prev => [...prev, profile]);
     setSelectedProfileId(profile.id);
     
@@ -91,6 +97,7 @@ const Index = () => {
   };
   
   const handleProfileSelect = (id: string) => {
+    console.log("Selecting profile:", id);
     setSelectedProfileId(id);
     // Clear current temperature when switching profiles
     setCurrentTemperature(null);
@@ -99,6 +106,7 @@ const Index = () => {
   const handleTemperatureSubmit = (temperature: Temperature) => {
     if (!selectedProfileId) return;
     
+    console.log("Submitting temperature:", temperature);
     const newReading: TemperatureReading = {
       ...temperature,
       id: `reading-${Date.now()}`,
@@ -116,6 +124,9 @@ const Index = () => {
   
   const selectedProfile = profiles.find(p => p.id === selectedProfileId);
   const profileTemperatures = temperatures.filter(t => t.childId === selectedProfileId);
+  
+  console.log("Selected profile:", selectedProfile);
+  console.log("Profile temperatures:", profileTemperatures?.length);
   
   return (
     <Layout>

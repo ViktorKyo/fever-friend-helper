@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Card, 
   CardContent, 
@@ -42,6 +42,12 @@ const symptomOptions: { label: string; value: Symptom }[] = [
 ];
 
 const TemperatureInput: React.FC<TemperatureInputProps> = ({ onSubmit }) => {
+  console.log("TemperatureInput rendering");
+  
+  useEffect(() => {
+    console.log("TemperatureInput mounted");
+  }, []);
+  
   const [activeUnit, setActiveUnit] = useState<TemperatureUnit>('C');
   const [temperature, setTemperature] = useState<string>('');
   const [selectedSymptoms, setSelectedSymptoms] = useState<Symptom[]>([]);
