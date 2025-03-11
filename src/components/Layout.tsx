@@ -11,7 +11,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   
-  console.log("Layout rendering, children:", children);
+  console.log("Layout rendering, children type:", typeof children, "children:", children);
   
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
