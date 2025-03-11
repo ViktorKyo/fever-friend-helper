@@ -27,42 +27,79 @@ const Index = () => {
   // On mount, check for saved profiles
   useEffect(() => {
     console.log("Index useEffect running");
-    const savedProfiles = localStorage.getItem('feverFriend_profiles');
-    const savedTemperatures = localStorage.getItem('feverFriend_temperatures');
     
-    if (savedProfiles) {
-      try {
-        const parsedProfiles = JSON.parse(savedProfiles);
-        // Convert string dates back to Date objects
-        const processedProfiles = parsedProfiles.map((profile: any) => ({
-          ...profile,
-          birthdate: new Date(profile.birthdate)
-        }));
-        setProfiles(processedProfiles);
-        console.log("Loaded profiles:", processedProfiles);
-        
-        // If profiles exist, select the first one
-        if (processedProfiles.length > 0) {
-          setSelectedProfileId(processedProfiles[0].id);
+    // Create a default profile if none exists for testing
+    const defaultProfile: ChildProfileType = {
+      id: 'profile-default',
+      name: 'Test Child',
+      birthdate: new Date(2020, 0, 1)
+    };
+    
+    try {
+      const savedProfiles = localStorage.getItem('feverFriend_profiles');
+      const savedTemperatures = localStorage.getItem('feverFriend_temperatures');
+      
+      let processedProfiles: ChildProfileType[] = [];
+      
+      if (savedProfiles) {
+        try {
+          const parsedProfiles = JSON.parse(savedProfiles);
+          // Convert string dates back to Date objects
+          processedProfiles = parsedProfiles.map((profile: any) => ({
+            ...profile,
+            birthdate: new Date(profile.birthdate)
+          }));
+          console.log("Loaded profiles:", processedProfiles);
+        } catch (e) {
+          console.error('Error parsing saved profiles', e);
+          processedProfiles = [defaultProfile];
         }
-      } catch (e) {
-        console.error('Error parsing saved profiles', e);
+      } else {
+        // No saved profiles, use default
+        processedProfiles = [defaultProfile];
+        console.log("Using default profile");
       }
-    }
-    
-    if (savedTemperatures) {
-      try {
-        const parsedTemperatures = JSON.parse(savedTemperatures);
-        // Convert string dates back to Date objects
-        const processedTemperatures = parsedTemperatures.map((temp: any) => ({
-          ...temp,
-          timestamp: new Date(temp.timestamp)
-        }));
-        setTemperatures(processedTemperatures);
-        console.log("Loaded temperatures:", processedTemperatures);
-      } catch (e) {
-        console.error('Error parsing saved temperatures', e);
+      
+      setProfiles(processedProfiles);
+      
+      // If profiles exist, select the first one
+      if (processedProfiles.length > 0) {
+        setSelectedProfileId(processedProfiles[0].id);
       }
+      
+      let processedTemperatures: TemperatureReading[] = [];
+      
+      if (savedTemperatures) {
+        try {
+          const parsedTemperatures = JSON.parse(savedTemperatures);
+          // Convert string dates back to Date objects
+          processedTemperatures = parsedTemperatures.map((temp: any) => ({
+            ...temp,
+            timestamp: new Date(temp.timestamp)
+          }));
+          console.log("Loaded temperatures:", processedTemperatures);
+        } catch (e) {
+          console.error('Error parsing saved temperatures', e);
+          // Generate mock data if parsing fails
+          if (processedProfiles.length > 0) {
+            processedTemperatures = generateMockReadings(processedProfiles[0].id);
+          }
+        }
+      } else {
+        // No saved temperatures, generate mock data
+        if (processedProfiles.length > 0) {
+          processedTemperatures = generateMockReadings(processedProfiles[0].id);
+        }
+      }
+      
+      setTemperatures(processedTemperatures);
+      
+    } catch (e) {
+      console.error("Error in Index useEffect:", e);
+      // Fallback to default data
+      setProfiles([defaultProfile]);
+      setSelectedProfileId(defaultProfile.id);
+      setTemperatures(generateMockReadings(defaultProfile.id));
     }
   }, []);
   
@@ -126,7 +163,7 @@ const Index = () => {
   const profileTemperatures = temperatures.filter(t => t.childId === selectedProfileId);
   
   console.log("Selected profile:", selectedProfile);
-  console.log("Profile temperatures:", profileTemperatures?.length);
+  console.log("Profile temperatures count:", profileTemperatures?.length);
   
   return (
     <Layout>
@@ -136,39 +173,47 @@ const Index = () => {
           <p className="text-muted-foreground mt-1">Guidance for parents when fever strikes</p>
         </header>
         
-        <ChildProfile 
-          profiles={profiles}
-          selectedProfileId={selectedProfileId || ''}
-          onProfileSelect={handleProfileSelect}
-          onProfileAdd={handleProfileAdd}
-        />
-        
-        {selectedProfile && (
+        {profiles.length > 0 ? (
           <>
-            <TemperatureInput onSubmit={handleTemperatureSubmit} />
+            <ChildProfile 
+              profiles={profiles}
+              selectedProfileId={selectedProfileId || ''}
+              onProfileSelect={handleProfileSelect}
+              onProfileAdd={handleProfileAdd}
+            />
             
-            {currentTemperature && (
-              <AdviceDisplay 
-                temperature={currentTemperature}
-                childProfile={selectedProfile}
-              />
-            )}
-            
-            {profileTemperatures.length > 0 && (
+            {selectedProfile && (
               <>
-                <SymptomTracker 
-                  childProfile={selectedProfile}
-                  readings={profileTemperatures}
-                />
+                <TemperatureInput onSubmit={handleTemperatureSubmit} />
                 
-                <TemperatureHistory
-                  readings={profileTemperatures}
-                  childProfile={selectedProfile}
-                  limit={3}
-                />
+                {currentTemperature && (
+                  <AdviceDisplay 
+                    temperature={currentTemperature}
+                    childProfile={selectedProfile}
+                  />
+                )}
+                
+                {profileTemperatures.length > 0 && (
+                  <>
+                    <SymptomTracker 
+                      childProfile={selectedProfile}
+                      readings={profileTemperatures}
+                    />
+                    
+                    <TemperatureHistory
+                      readings={profileTemperatures}
+                      childProfile={selectedProfile}
+                      limit={3}
+                    />
+                  </>
+                )}
               </>
             )}
           </>
+        ) : (
+          <div className="text-center p-8 border border-dashed rounded-lg">
+            <p>Loading profiles...</p>
+          </div>
         )}
       </div>
     </Layout>

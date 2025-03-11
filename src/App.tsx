@@ -9,8 +9,15 @@ import History from "./pages/History";
 import Advice from "./pages/Advice";
 import NotFound from "./pages/NotFound";
 
-// Create a new query client instance
-const queryClient = new QueryClient();
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => {
   console.log("App rendering");
@@ -19,15 +26,17 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <TooltipProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/advice" element={<Advice />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Toaster />
-          <Sonner />
+          <div className="app-container">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/advice" element={<Advice />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Toaster />
+            <Sonner />
+          </div>
         </TooltipProvider>
       </BrowserRouter>
     </QueryClientProvider>
