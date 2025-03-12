@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/Layout';
 import ChildProfile from '@/components/ChildProfile';
 import TemperatureInput from '@/components/TemperatureInput';
@@ -15,11 +15,12 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Button } from "@/components/ui/button";
 
+// Define a context object to store application state
+const LOCAL_STORAGE_PROFILES_KEY = 'feverFriend_profiles';
+const LOCAL_STORAGE_TEMPS_KEY = 'feverFriend_temperatures';
+
 const Index = () => {
-  console.log("Index page rendering - component initialized");
-  
-  // Prevent multiple initializations
-  const initialized = useRef(false);
+  console.log("Index page rendering");
   
   const { toast } = useToast();
   const [profiles, setProfiles] = useState<ChildProfileType[]>([]);
@@ -27,87 +28,96 @@ const Index = () => {
   const [temperatures, setTemperatures] = useState<TemperatureReading[]>([]);
   const [currentTemperature, setCurrentTemperature] = useState<Temperature | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Force render control
+  const hasInitialized = useRef(false);
   
   // Create default profile for initialization
-  const createDefaultProfile = useCallback((): ChildProfileType => {
+  const createDefaultProfile = (): ChildProfileType => {
     console.log("Creating default profile");
     return {
       id: 'profile-default',
       name: 'Test Child',
       birthdate: new Date(2020, 0, 1)
     };
-  }, []);
+  };
   
   // Load data from localStorage with proper error handling
   useEffect(() => {
-    // Prevent double initialization
-    if (initialized.current) {
-      console.log("Index already initialized, skipping second initialization");
+    // Skip if already initialized to prevent double-loading
+    if (hasInitialized.current) {
+      console.log("Index already initialized, skipping re-initialization");
       return;
     }
     
-    initialized.current = true;
     console.log("Index useEffect running - loading data");
     setIsLoading(true);
+    setError(null);
     
     try {
+      // Set initialization flag immediately
+      hasInitialized.current = true;
+      
       // Load profiles from localStorage with fallback
-      let processedProfiles: ChildProfileType[] = [];
-      const savedProfiles = localStorage.getItem('feverFriend_profiles');
+      let loadedProfiles: ChildProfileType[] = [];
+      const savedProfiles = localStorage.getItem(LOCAL_STORAGE_PROFILES_KEY);
       
       if (savedProfiles) {
         try {
           const parsedProfiles = JSON.parse(savedProfiles);
-          processedProfiles = parsedProfiles.map((profile: any) => ({
+          loadedProfiles = parsedProfiles.map((profile: any) => ({
             ...profile,
             birthdate: new Date(profile.birthdate)
           }));
-          console.log("Successfully loaded profiles:", processedProfiles.length);
+          console.log("Successfully loaded profiles:", loadedProfiles.length);
         } catch (e) {
           console.error('Error parsing saved profiles, using default', e);
-          processedProfiles = [createDefaultProfile()];
+          loadedProfiles = [createDefaultProfile()];
         }
       } else {
         console.log("No saved profiles, using default profile");
-        processedProfiles = [createDefaultProfile()];
+        loadedProfiles = [createDefaultProfile()];
       }
       
-      setProfiles(processedProfiles);
+      setProfiles(loadedProfiles);
       
       // If profiles exist, select the first one
-      if (processedProfiles.length > 0) {
-        setSelectedProfileId(processedProfiles[0].id);
+      if (loadedProfiles.length > 0) {
+        setSelectedProfileId(loadedProfiles[0].id);
       }
       
       // Load temperatures from localStorage with fallback
-      let processedTemperatures: TemperatureReading[] = [];
-      const savedTemperatures = localStorage.getItem('feverFriend_temperatures');
+      let loadedTemperatures: TemperatureReading[] = [];
+      const savedTemperatures = localStorage.getItem(LOCAL_STORAGE_TEMPS_KEY);
       
       if (savedTemperatures) {
         try {
           const parsedTemperatures = JSON.parse(savedTemperatures);
-          processedTemperatures = parsedTemperatures.map((temp: any) => ({
+          loadedTemperatures = parsedTemperatures.map((temp: any) => ({
             ...temp,
             timestamp: new Date(temp.timestamp)
           }));
-          console.log("Successfully loaded temperatures:", processedTemperatures.length);
+          console.log("Successfully loaded temperatures:", loadedTemperatures.length);
         } catch (e) {
           console.error('Error parsing saved temperatures, using mock data', e);
-          if (processedProfiles.length > 0) {
-            processedTemperatures = generateMockReadings(processedProfiles[0].id);
+          if (loadedProfiles.length > 0) {
+            loadedTemperatures = generateMockReadings(loadedProfiles[0].id);
           }
         }
       } else {
         console.log("No saved temperatures, generating mock data");
-        if (processedProfiles.length > 0) {
-          processedTemperatures = generateMockReadings(processedProfiles[0].id);
+        if (loadedProfiles.length > 0) {
+          loadedTemperatures = generateMockReadings(loadedProfiles[0].id);
         }
       }
       
-      setTemperatures(processedTemperatures);
+      setTemperatures(loadedTemperatures);
     } catch (e) {
       console.error("Critical error in Index useEffect:", e);
-      // Fallback to default data
+      setError("Failed to load application data. Please try refreshing the page.");
+      
+      // Fallback to default data even on error
       const defaultProfile = createDefaultProfile();
       setProfiles([defaultProfile]);
       setSelectedProfileId(defaultProfile.id);
@@ -116,13 +126,13 @@ const Index = () => {
       setIsLoading(false);
       console.log("Data loading complete");
     }
-  }, [createDefaultProfile]);
+  }, []); // Empty dependencies to run only once
   
-  // Save to localStorage whenever data changes
+  // Save to localStorage whenever profiles change
   useEffect(() => {
     if (profiles.length > 0) {
       try {
-        localStorage.setItem('feverFriend_profiles', JSON.stringify(profiles));
+        localStorage.setItem(LOCAL_STORAGE_PROFILES_KEY, JSON.stringify(profiles));
         console.log("Saved profiles to localStorage");
       } catch (e) {
         console.error("Failed to save profiles to localStorage:", e);
@@ -130,10 +140,11 @@ const Index = () => {
     }
   }, [profiles]);
   
+  // Save to localStorage whenever temperatures change
   useEffect(() => {
     if (temperatures.length > 0) {
       try {
-        localStorage.setItem('feverFriend_temperatures', JSON.stringify(temperatures));
+        localStorage.setItem(LOCAL_STORAGE_TEMPS_KEY, JSON.stringify(temperatures));
         console.log("Saved temperatures to localStorage");
       } catch (e) {
         console.error("Failed to save temperatures to localStorage:", e);
@@ -172,7 +183,8 @@ const Index = () => {
     const newReading: TemperatureReading = {
       ...temperature,
       id: `reading-${Date.now()}`,
-      childId: selectedProfileId
+      childId: selectedProfileId,
+      timestamp: new Date()
     };
     
     setTemperatures(prev => [newReading, ...prev]);
@@ -187,8 +199,31 @@ const Index = () => {
   const selectedProfile = profiles.find(p => p.id === selectedProfileId);
   const profileTemperatures = temperatures.filter(t => t.childId === selectedProfileId);
   
-  console.log("Selected profile:", selectedProfile?.name);
-  console.log("Profile temperatures count:", profileTemperatures?.length);
+  console.log("Selected profile:", selectedProfile?.name || "none");
+  console.log("Profile temperatures count:", profileTemperatures?.length || 0);
+  
+  // If we have an error, show error message
+  if (error) {
+    return (
+      <Layout>
+        <div className="flex flex-col items-center justify-center min-h-[50vh]">
+          <div className="p-6 bg-destructive/10 border border-destructive/20 rounded-lg text-center max-w-md mx-auto">
+            <h2 className="text-xl font-semibold text-destructive mb-2">Error Loading Application</h2>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <Button 
+              onClick={() => {
+                hasInitialized.current = false;
+                window.location.reload();
+              }}
+              variant="destructive"
+            >
+              Refresh Page
+            </Button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
   
   // If we're loading, show a loading indicator
   if (isLoading) {

@@ -12,17 +12,28 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   
   useEffect(() => {
-    console.log("Layout mounted with children:", children ? "present" : "missing");
+    console.log("Layout mounted with location:", location.pathname);
     
     return () => {
-      console.log("Layout unmounting");
+      console.log("Layout unmounting from path:", location.pathname);
     };
-  }, []);
+  }, [location.pathname]);
+  
+  // If children are not provided, log an error but don't crash
+  if (!children) {
+    console.error("Layout rendered without children");
+  }
   
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <main className="flex-1 container max-w-screen-md mx-auto px-4 pb-24 pt-8 md:pt-12">
-        {children}
+        {/* Render children or a fallback message if they're missing */}
+        {children || (
+          <div className="p-6 border border-yellow-300 bg-yellow-50 rounded-lg text-center my-8">
+            <h2 className="font-medium text-yellow-800">Content Not Available</h2>
+            <p className="text-sm text-yellow-700 mt-1">Please refresh the page to try again.</p>
+          </div>
+        )}
       </main>
       
       <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border py-2 px-4 z-50">
