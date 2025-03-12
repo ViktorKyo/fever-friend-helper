@@ -16,7 +16,11 @@ console.log("Main rendering - initializing application");
 
 // Create root and render immediately
 const root = createRoot(rootElement);
-root.render(<App />);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
 console.log("App rendering started");
 
 // Handle unhandled errors at the global level

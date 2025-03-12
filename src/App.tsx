@@ -23,34 +23,15 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useState(true); // Start ready by default
   const appInitialized = useRef(false);
   
   useEffect(() => {
     if (appInitialized.current) return;
     appInitialized.current = true;
     
-    console.log("App initializing...");
-    // This ensures the app has a chance to fully initialize before rendering routes
-    const timer = setTimeout(() => {
-      console.log("App ready");
-      setIsReady(true);
-    }, 100);
-    
-    return () => clearTimeout(timer);
+    console.log("App initializing... (will render immediately)");
   }, []);
-  
-  // If app isn't ready yet, render a minimal loading state
-  if (!isReady) {
-    return (
-      <div className="app-container flex flex-col min-h-screen w-full bg-background items-center justify-center">
-        <div className="text-center p-6">
-          <h1 className="text-3xl font-bold text-primary mb-2">Fever Friend</h1>
-          <p className="text-muted-foreground">Loading application...</p>
-        </div>
-      </div>
-    );
-  }
   
   return (
     <QueryClientProvider client={queryClient}>
