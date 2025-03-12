@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Home, Clock, BookOpen } from 'lucide-react';
@@ -11,7 +11,13 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   
-  console.log("Layout rendering with children", children ? "present" : "missing");
+  useEffect(() => {
+    console.log("Layout mounted with children:", children ? "present" : "missing");
+    
+    return () => {
+      console.log("Layout unmounting");
+    };
+  }, []);
   
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">

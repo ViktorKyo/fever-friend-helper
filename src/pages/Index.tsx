@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Layout from '@/components/Layout';
 import ChildProfile from '@/components/ChildProfile';
 import TemperatureInput from '@/components/TemperatureInput';
@@ -13,10 +13,13 @@ import {
   generateMockReadings 
 } from '@/lib/feverGuide';
 import { useToast } from '@/hooks/use-toast';
-import { Thermometer } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   console.log("Index page rendering - component initialized");
+  
+  // Prevent multiple initializations
+  const initialized = useRef(false);
   
   const { toast } = useToast();
   const [profiles, setProfiles] = useState<ChildProfileType[]>([]);
@@ -37,6 +40,13 @@ const Index = () => {
   
   // Load data from localStorage with proper error handling
   useEffect(() => {
+    // Prevent double initialization
+    if (initialized.current) {
+      console.log("Index already initialized, skipping second initialization");
+      return;
+    }
+    
+    initialized.current = true;
     console.log("Index useEffect running - loading data");
     setIsLoading(true);
     
@@ -180,6 +190,21 @@ const Index = () => {
   console.log("Selected profile:", selectedProfile?.name);
   console.log("Profile temperatures count:", profileTemperatures?.length);
   
+  // If we're loading, show a loading indicator
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex flex-col items-center justify-center min-h-[50vh]">
+          <div className="animate-pulse flex flex-col items-center">
+            <div className="h-8 w-40 bg-muted rounded mb-4"></div>
+            <div className="h-4 w-60 bg-muted rounded"></div>
+          </div>
+          <p className="mt-8 text-muted-foreground">Loading application data...</p>
+        </div>
+      </Layout>
+    );
+  }
+  
   return (
     <Layout>
       <div className="space-y-6">
@@ -188,11 +213,7 @@ const Index = () => {
           <p className="text-muted-foreground mt-1">Guidance for parents when fever strikes</p>
         </header>
         
-        {isLoading ? (
-          <div className="text-center p-8 border border-dashed rounded-lg">
-            <p>Loading profiles and temperature data...</p>
-          </div>
-        ) : profiles.length > 0 ? (
+        {profiles.length > 0 ? (
           <>
             <ChildProfile 
               profiles={profiles}
@@ -247,8 +268,5 @@ const Index = () => {
     </Layout>
   );
 };
-
-// Add missing import
-import { Button } from "@/components/ui/button";
 
 export default Index;
