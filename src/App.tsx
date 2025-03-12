@@ -9,24 +9,25 @@ import History from "./pages/History";
 import Advice from "./pages/Advice";
 import NotFound from "./pages/NotFound";
 
-// Create a client
+// Create a client with more stable configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
       refetchOnWindowFocus: false,
+      staleTime: Infinity, // Prevent automatic refetching
     },
   },
 });
 
 const App = () => {
-  console.log("App rendering");
+  console.log("App rendering with stable configuration");
   
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <TooltipProvider>
-          <div className="app-container">
+          <div className="app-container flex flex-col min-h-screen w-full">
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/history" element={<History />} />

@@ -8,9 +8,9 @@ import './index.css';
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error('Root element not found');
 
-console.log("Main rendering");
+console.log("Main rendering - initializing application");
 
 const root = createRoot(rootElement);
-root.render(
-  <App />
-);
+
+// Render without StrictMode to prevent double mounting/unmounting in development
+root.render(<App />);
