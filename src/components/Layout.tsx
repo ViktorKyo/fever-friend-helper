@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Home, Clock, BookOpen } from 'lucide-react';
@@ -10,25 +10,30 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
+  const mountRef = useRef<boolean>(false);
   
   useEffect(() => {
     console.log("Layout mounted with location:", location.pathname);
+    mountRef.current = true;
     
     return () => {
       console.log("Layout unmounting from path:", location.pathname);
+      mountRef.current = false;
     };
   }, [location.pathname]);
   
-  // If children are not provided, log an error but don't crash
-  if (!children) {
-    console.error("Layout rendered without children");
-  }
+  // Ensure children are present
+  const hasChildren = Boolean(children);
+  console.log("Layout rendering, has children:", hasChildren);
   
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <main className="flex-1 container max-w-screen-md mx-auto px-4 pb-24 pt-8 md:pt-12">
-        {/* Render children or a fallback message if they're missing */}
-        {children || (
+        {children ? (
+          <div className="w-full" data-testid="layout-children">
+            {children}
+          </div>
+        ) : (
           <div className="p-6 border border-yellow-300 bg-yellow-50 rounded-lg text-center my-8">
             <h2 className="font-medium text-yellow-800">Content Not Available</h2>
             <p className="text-sm text-yellow-700 mt-1">Please refresh the page to try again.</p>
