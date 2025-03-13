@@ -4,22 +4,17 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-// Get the root element only once
+// Get the root element and create root only once
 const rootElement = document.getElementById("root");
 
 if (!rootElement) {
   throw new Error('Fatal: Root element not found');
 }
 
-// Create the root only once
 const root = createRoot(rootElement);
 
-// Render the app with StrictMode to catch potential issues
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// Render the app without StrictMode (already in App.tsx)
+root.render(<App />);
 
 // Handle unhandled errors
 window.addEventListener('error', (event) => {

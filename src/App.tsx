@@ -8,8 +8,9 @@ import Index from "./pages/Index";
 import History from "./pages/History";
 import Advice from "./pages/Advice";
 import NotFound from "./pages/NotFound";
+import React from "react";
 
-// Create a stable query client configuration with retries disabled
+// Create a stable query client instance that won't change on rerenders
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -22,25 +23,27 @@ const queryClient = new QueryClient({
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <TooltipProvider>
-          <div className="app-container flex flex-col min-h-screen w-full bg-background">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/history" element={<History />} />
-              <Route path="/advice" element={<Advice />} />
-              <Route path="/404" element={<NotFound />} />
-              <Route path="*" element={<Navigate to="/404" replace />} />
-            </Routes>
-            
-            {/* Toast components for notifications */}
-            <Toaster />
-            <Sonner />
-          </div>
-        </TooltipProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <TooltipProvider>
+            <div className="app-container flex flex-col min-h-screen w-full bg-background">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/history" element={<History />} />
+                <Route path="/advice" element={<Advice />} />
+                <Route path="/404" element={<NotFound />} />
+                <Route path="*" element={<Navigate to="/404" replace />} />
+              </Routes>
+              
+              {/* Toast components for notifications */}
+              <Toaster />
+              <Sonner />
+            </div>
+          </TooltipProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </React.StrictMode>
   );
 };
 
