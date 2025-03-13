@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import ChildProfile from '@/components/ChildProfile';
 import TemperatureInput from '@/components/TemperatureInput';
@@ -21,7 +21,6 @@ const LOCAL_STORAGE_TEMPS_KEY = 'feverFriend_temperatures';
 
 // Create default profile for initialization
 const createDefaultProfile = (): ChildProfileType => {
-  console.log("Creating default profile");
   return {
     id: 'profile-default',
     name: 'Test Child',
@@ -30,122 +29,80 @@ const createDefaultProfile = (): ChildProfileType => {
 };
 
 const Index = () => {
-  console.log("Index page rendering");
-  
   const { toast } = useToast();
   const [profiles, setProfiles] = useState<ChildProfileType[]>([]);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
   const [temperatures, setTemperatures] = useState<TemperatureReading[]>([]);
   const [currentTemperature, setCurrentTemperature] = useState<Temperature | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const hasInitialized = useRef(false);
 
   // Initialize data once on mount
   useEffect(() => {
-    if (hasInitialized.current) {
-      console.log("Skipping re-initialization");
-      return;
-    }
-    
-    console.log("Index initializing data");
-    hasInitialized.current = true;
-    
+    // Load profiles
+    let loadedProfiles: ChildProfileType[] = [];
     try {
-      let loadedProfiles: ChildProfileType[] = [];
       const savedProfiles = localStorage.getItem(LOCAL_STORAGE_PROFILES_KEY);
       
       if (savedProfiles) {
-        try {
-          const parsedProfiles = JSON.parse(savedProfiles);
-          loadedProfiles = parsedProfiles.map((profile: any) => ({
-            ...profile,
-            birthdate: new Date(profile.birthdate)
-          }));
-          console.log("Successfully loaded profiles:", loadedProfiles.length);
-        } catch (e) {
-          console.error('Error parsing saved profiles, using default', e);
-          loadedProfiles = [createDefaultProfile()];
-        }
+        const parsedProfiles = JSON.parse(savedProfiles);
+        loadedProfiles = parsedProfiles.map((profile: any) => ({
+          ...profile,
+          birthdate: new Date(profile.birthdate)
+        }));
       } else {
-        console.log("No saved profiles, using default profile");
         loadedProfiles = [createDefaultProfile()];
       }
-      
-      setProfiles(loadedProfiles);
-      
-      // If profiles exist, select the first one
-      if (loadedProfiles.length > 0) {
-        setSelectedProfileId(loadedProfiles[0].id);
-      }
-      
-      // Load temperatures
-      let loadedTemperatures: TemperatureReading[] = [];
+    } catch (e) {
+      console.error('Error loading profiles, using default', e);
+      loadedProfiles = [createDefaultProfile()];
+    }
+    
+    setProfiles(loadedProfiles);
+    
+    // If profiles exist, select the first one
+    if (loadedProfiles.length > 0) {
+      setSelectedProfileId(loadedProfiles[0].id);
+    }
+    
+    // Load temperatures
+    let loadedTemperatures: TemperatureReading[] = [];
+    try {
       const savedTemperatures = localStorage.getItem(LOCAL_STORAGE_TEMPS_KEY);
       
       if (savedTemperatures) {
-        try {
-          const parsedTemperatures = JSON.parse(savedTemperatures);
-          loadedTemperatures = parsedTemperatures.map((temp: any) => ({
-            ...temp,
-            timestamp: new Date(temp.timestamp)
-          }));
-          console.log("Successfully loaded temperatures:", loadedTemperatures.length);
-        } catch (e) {
-          console.error('Error parsing saved temperatures, using mock data', e);
-          if (loadedProfiles.length > 0) {
-            loadedTemperatures = generateMockReadings(loadedProfiles[0].id);
-          }
-        }
-      } else {
-        console.log("No saved temperatures, generating mock data");
-        if (loadedProfiles.length > 0) {
-          loadedTemperatures = generateMockReadings(loadedProfiles[0].id);
-        }
+        const parsedTemperatures = JSON.parse(savedTemperatures);
+        loadedTemperatures = parsedTemperatures.map((temp: any) => ({
+          ...temp,
+          timestamp: new Date(temp.timestamp)
+        }));
+      } else if (loadedProfiles.length > 0) {
+        loadedTemperatures = generateMockReadings(loadedProfiles[0].id);
       }
-      
-      setTemperatures(loadedTemperatures);
     } catch (e) {
-      console.error("Error initializing data:", e);
-      
-      // Fallback to default data on error
-      const defaultProfile = createDefaultProfile();
-      setProfiles([defaultProfile]);
-      setSelectedProfileId(defaultProfile.id);
-      setTemperatures(generateMockReadings(defaultProfile.id));
+      console.error('Error loading temperatures, using mock data', e);
+      if (loadedProfiles.length > 0) {
+        loadedTemperatures = generateMockReadings(loadedProfiles[0].id);
+      }
     }
+    
+    setTemperatures(loadedTemperatures);
   }, []);
   
-  // Save to localStorage whenever profiles change
+  // Save to localStorage whenever profiles or temperatures change
   useEffect(() => {
     if (profiles.length > 0) {
-      try {
-        localStorage.setItem(LOCAL_STORAGE_PROFILES_KEY, JSON.stringify(profiles));
-        console.log("Saved profiles to localStorage");
-      } catch (e) {
-        console.error("Failed to save profiles to localStorage:", e);
-      }
+      localStorage.setItem(LOCAL_STORAGE_PROFILES_KEY, JSON.stringify(profiles));
     }
-  }, [profiles]);
-  
-  // Save to localStorage whenever temperatures change
-  useEffect(() => {
+    
     if (temperatures.length > 0) {
-      try {
-        localStorage.setItem(LOCAL_STORAGE_TEMPS_KEY, JSON.stringify(temperatures));
-        console.log("Saved temperatures to localStorage");
-      } catch (e) {
-        console.error("Failed to save temperatures to localStorage:", e);
-      }
+      localStorage.setItem(LOCAL_STORAGE_TEMPS_KEY, JSON.stringify(temperatures));
     }
-  }, [temperatures]);
+  }, [profiles, temperatures]);
   
   const handleProfileAdd = (profile: ChildProfileType) => {
-    console.log("Adding profile:", profile.name);
     setProfiles(prev => [...prev, profile]);
     setSelectedProfileId(profile.id);
     
-    // If this is the first profile, add some mock data for demonstration
+    // If this is the first profile, add some mock data
     if (profiles.length === 0) {
       const mockReadings = generateMockReadings(profile.id);
       setTemperatures(mockReadings);
@@ -158,16 +115,13 @@ const Index = () => {
   };
   
   const handleProfileSelect = (id: string) => {
-    console.log("Selecting profile:", id);
     setSelectedProfileId(id);
-    // Clear current temperature when switching profiles
     setCurrentTemperature(null);
   };
   
   const handleTemperatureSubmit = (temperature: Temperature) => {
     if (!selectedProfileId) return;
     
-    console.log("Submitting temperature:", temperature.value, temperature.unit);
     const newReading: TemperatureReading = {
       ...temperature,
       id: `reading-${Date.now()}`,
@@ -186,47 +140,16 @@ const Index = () => {
   
   const selectedProfile = profiles.find(p => p.id === selectedProfileId);
   const profileTemperatures = temperatures.filter(t => t.childId === selectedProfileId);
-  
-  console.log("Selected profile:", selectedProfile?.name || "none");
-  console.log("Profile temperatures count:", profileTemperatures?.length || 0);
-  
-  // Always render content, loading state is managed with conditionals inside
+
   return (
     <Layout>
-      <div className="space-y-6" id="index-content">
+      <div className="space-y-6">
         <header className="text-center mb-8">
           <h1 className="text-3xl font-bold tracking-tight text-primary">Fever Friend</h1>
           <p className="text-muted-foreground mt-1">Guidance for parents when fever strikes</p>
         </header>
         
-        {isLoading ? (
-          <div className="min-h-[60vh] flex items-center justify-center">
-            <div className="text-center">
-              <div className="animate-pulse space-y-4">
-                <div className="h-12 w-48 bg-muted mx-auto rounded"></div>
-                <div className="h-4 w-64 bg-muted mx-auto rounded"></div>
-                <div className="h-4 w-32 bg-muted mx-auto rounded"></div>
-              </div>
-              <p className="mt-6 text-muted-foreground">Loading your data...</p>
-            </div>
-          </div>
-        ) : error ? (
-          <div className="flex flex-col items-center justify-center min-h-[50vh]">
-            <div className="p-6 bg-destructive/10 border border-destructive/20 rounded-lg text-center max-w-md mx-auto">
-              <h2 className="text-xl font-semibold text-destructive mb-2">Error Loading Application</h2>
-              <p className="text-muted-foreground mb-4">{error}</p>
-              <Button 
-                onClick={() => {
-                  hasInitialized.current = false;
-                  window.location.reload();
-                }}
-                variant="destructive"
-              >
-                Refresh Page
-              </Button>
-            </div>
-          </div>
-        ) : profiles.length > 0 ? (
+        {profiles.length > 0 ? (
           <>
             <ChildProfile 
               profiles={profiles}

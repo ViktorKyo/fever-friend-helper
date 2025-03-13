@@ -11,19 +11,12 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   
-  console.log("Layout rendering with children:", !!children);
-  
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <main className="flex-1 container max-w-screen-md mx-auto px-4 pb-24 pt-8 md:pt-12">
-        {/* Guarantee children rendering with fallback */}
-        <div className="w-full" data-testid="layout-children">
-          {children || (
-            <div className="p-6 border border-yellow-300 bg-yellow-50 rounded-lg text-center my-8">
-              <h2 className="font-medium text-yellow-800">Content Loading...</h2>
-              <p className="text-sm text-yellow-700 mt-1">Please wait a moment.</p>
-            </div>
-          )}
+        {/* Main content area - always render children */}
+        <div className="w-full">
+          {children}
         </div>
       </main>
       
