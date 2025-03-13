@@ -30,16 +30,19 @@ const createDefaultProfile = (): ChildProfileType => {
 
 const Index = () => {
   const { toast } = useToast();
+  
+  // Managed state with explicit initialization to prevent undefined states
   const [profiles, setProfiles] = useState<ChildProfileType[]>([]);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
   const [temperatures, setTemperatures] = useState<TemperatureReading[]>([]);
   const [currentTemperature, setCurrentTemperature] = useState<Temperature | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // Initialize data once on mount
   useEffect(() => {
-    // Load profiles
-    let loadedProfiles: ChildProfileType[] = [];
     try {
+      // Load profiles
+      let loadedProfiles: ChildProfileType[] = [];
       const savedProfiles = localStorage.getItem(LOCAL_STORAGE_PROFILES_KEY);
       
       if (savedProfiles) {
@@ -51,21 +54,16 @@ const Index = () => {
       } else {
         loadedProfiles = [createDefaultProfile()];
       }
-    } catch (e) {
-      console.error('Error loading profiles, using default', e);
-      loadedProfiles = [createDefaultProfile()];
-    }
-    
-    setProfiles(loadedProfiles);
-    
-    // If profiles exist, select the first one
-    if (loadedProfiles.length > 0) {
-      setSelectedProfileId(loadedProfiles[0].id);
-    }
-    
-    // Load temperatures
-    let loadedTemperatures: TemperatureReading[] = [];
-    try {
+      
+      setProfiles(loadedProfiles);
+      
+      // If profiles exist, select the first one
+      if (loadedProfiles.length > 0) {
+        setSelectedProfileId(loadedProfiles[0].id);
+      }
+      
+      // Load temperatures
+      let loadedTemperatures: TemperatureReading[] = [];
       const savedTemperatures = localStorage.getItem(LOCAL_STORAGE_TEMPS_KEY);
       
       if (savedTemperatures) {
@@ -77,18 +75,24 @@ const Index = () => {
       } else if (loadedProfiles.length > 0) {
         loadedTemperatures = generateMockReadings(loadedProfiles[0].id);
       }
+      
+      setTemperatures(loadedTemperatures);
     } catch (e) {
-      console.error('Error loading temperatures, using mock data', e);
-      if (loadedProfiles.length > 0) {
-        loadedTemperatures = generateMockReadings(loadedProfiles[0].id);
-      }
+      console.error('Error initializing data:', e);
+      // Fallback to default values if there's an error
+      const defaultProfile = createDefaultProfile();
+      setProfiles([defaultProfile]);
+      setSelectedProfileId(defaultProfile.id);
+      setTemperatures(generateMockReadings(defaultProfile.id));
+    } finally {
+      setIsLoaded(true);
     }
-    
-    setTemperatures(loadedTemperatures);
   }, []);
   
   // Save to localStorage whenever profiles or temperatures change
   useEffect(() => {
+    if (!isLoaded) return; // Skip saving until initial load is complete
+
     if (profiles.length > 0) {
       localStorage.setItem(LOCAL_STORAGE_PROFILES_KEY, JSON.stringify(profiles));
     }
@@ -96,7 +100,7 @@ const Index = () => {
     if (temperatures.length > 0) {
       localStorage.setItem(LOCAL_STORAGE_TEMPS_KEY, JSON.stringify(temperatures));
     }
-  }, [profiles, temperatures]);
+  }, [profiles, temperatures, isLoaded]);
   
   const handleProfileAdd = (profile: ChildProfileType) => {
     setProfiles(prev => [...prev, profile]);
@@ -149,55 +153,61 @@ const Index = () => {
           <p className="text-muted-foreground mt-1">Guidance for parents when fever strikes</p>
         </header>
         
-        {profiles.length > 0 ? (
-          <>
-            <ChildProfile 
-              profiles={profiles}
-              selectedProfileId={selectedProfileId || ''}
-              onProfileSelect={handleProfileSelect}
-              onProfileAdd={handleProfileAdd}
-            />
-            
-            {selectedProfile && (
-              <>
-                <TemperatureInput onSubmit={handleTemperatureSubmit} />
-                
-                {currentTemperature && (
-                  <AdviceDisplay 
-                    temperature={currentTemperature}
-                    childProfile={selectedProfile}
-                  />
-                )}
-                
-                {profileTemperatures.length > 0 && (
-                  <>
-                    <SymptomTracker 
+        {isLoaded ? (
+          profiles.length > 0 ? (
+            <>
+              <ChildProfile 
+                profiles={profiles}
+                selectedProfileId={selectedProfileId || ''}
+                onProfileSelect={handleProfileSelect}
+                onProfileAdd={handleProfileAdd}
+              />
+              
+              {selectedProfile && (
+                <>
+                  <TemperatureInput onSubmit={handleTemperatureSubmit} />
+                  
+                  {currentTemperature && (
+                    <AdviceDisplay 
+                      temperature={currentTemperature}
                       childProfile={selectedProfile}
-                      readings={profileTemperatures}
                     />
-                    
-                    <TemperatureHistory
-                      readings={profileTemperatures}
-                      childProfile={selectedProfile}
-                      limit={3}
-                    />
-                  </>
-                )}
-              </>
-            )}
-          </>
+                  )}
+                  
+                  {profileTemperatures.length > 0 && (
+                    <>
+                      <SymptomTracker 
+                        childProfile={selectedProfile}
+                        readings={profileTemperatures}
+                      />
+                      
+                      <TemperatureHistory
+                        readings={profileTemperatures}
+                        childProfile={selectedProfile}
+                        limit={3}
+                      />
+                    </>
+                  )}
+                </>
+              )}
+            </>
+          ) : (
+            <div className="text-center p-8 border border-dashed rounded-lg">
+              <p>No profiles found. Please add a child profile to get started.</p>
+              <Button 
+                onClick={() => {
+                  const defaultProfile = createDefaultProfile();
+                  handleProfileAdd(defaultProfile);
+                }}
+                className="mt-4"
+              >
+                Create Default Profile
+              </Button>
+            </div>
+          )
         ) : (
-          <div className="text-center p-8 border border-dashed rounded-lg">
-            <p>No profiles found. Please add a child profile to get started.</p>
-            <Button 
-              onClick={() => {
-                const defaultProfile = createDefaultProfile();
-                handleProfileAdd(defaultProfile);
-              }}
-              className="mt-4"
-            >
-              Create Default Profile
-            </Button>
+          <div className="text-center p-8">
+            <p>Loading application data...</p>
           </div>
         )}
       </div>

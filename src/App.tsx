@@ -9,7 +9,7 @@ import History from "./pages/History";
 import Advice from "./pages/Advice";
 import NotFound from "./pages/NotFound";
 
-// Create a stable query client configuration
+// Create a stable query client configuration with retries disabled
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

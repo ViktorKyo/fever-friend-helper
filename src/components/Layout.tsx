@@ -14,10 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <main className="flex-1 container max-w-screen-md mx-auto px-4 pb-24 pt-8 md:pt-12">
-        {/* Main content area - always render children */}
-        <div className="w-full">
-          {children}
-        </div>
+        {children}
       </main>
       
       <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border py-2 px-4 z-50">
