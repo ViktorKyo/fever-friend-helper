@@ -5,6 +5,7 @@ import ErrorDisplay from './ErrorDisplay';
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
+  fullPage?: boolean;
 }
 
 interface State {
@@ -33,7 +34,10 @@ class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) {
         return this.props.fallback;
       }
-      return <ErrorDisplay error={this.state.error?.message || "An unexpected error occurred"} />;
+      return <ErrorDisplay 
+        error={this.state.error?.message || "An unexpected error occurred"} 
+        fullPage={this.props.fullPage} 
+      />;
     }
 
     return this.props.children;

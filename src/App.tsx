@@ -10,7 +10,6 @@ import Advice from "./pages/Advice";
 import NotFound from "./pages/NotFound";
 import React, { useState, useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
-import ErrorDisplay from "./components/ErrorDisplay";
 import LoadingState from "./components/LoadingState";
 
 // Create a stable query client instance that won't change on rerenders
@@ -39,7 +38,7 @@ const App = () => {
     const timer = setTimeout(() => {
       setIsLoading(false);
       console.log("App finished initial loading");
-    }, 500);
+    }, 800); // Increased timeout for more reliable loading
     
     return () => clearTimeout(timer);
   }, []);
@@ -50,12 +49,12 @@ const App = () => {
 
   return (
     <React.StrictMode>
-      <ErrorBoundary>
+      <ErrorBoundary fullPage>
         <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <TooltipProvider>
+          <TooltipProvider>
+            <BrowserRouter>
               <div className="app-container flex flex-col min-h-screen w-full bg-background">
-                <ErrorBoundary>
+                <ErrorBoundary fullPage>
                   <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/history" element={<History />} />
@@ -69,8 +68,8 @@ const App = () => {
                 <Toaster />
                 <Sonner />
               </div>
-            </TooltipProvider>
-          </BrowserRouter>
+            </BrowserRouter>
+          </TooltipProvider>
         </QueryClientProvider>
       </ErrorBoundary>
     </React.StrictMode>
