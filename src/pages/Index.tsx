@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '@/components/Layout';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useTemperatures } from '@/hooks/useTemperatures';
@@ -10,6 +10,17 @@ import ProfileSection from '@/components/ProfileSection';
 import MainContent from '@/components/MainContent';
 
 const Index = () => {
+  // Force rerender after a small delay to ensure hooks are initialized properly
+  const [forceRender, setForceRender] = useState(false);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setForceRender(true);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
   // Use our custom hooks for state management
   const {
     profiles,
@@ -35,13 +46,15 @@ const Index = () => {
   // Debug logs
   useEffect(() => {
     console.log('Index rendering with state:', {
+      forceRender,
       isProfilesLoaded,
-      profilesLength: profiles.length,
+      profilesLength: profiles?.length || 0,
       selectedProfileId,
       hasSelectedProfile: !!selectedProfile,
       hasError: !!error,
+      temperatureReadings: profileTemperatures?.length || 0
     });
-  }, [isProfilesLoaded, profiles.length, selectedProfileId, selectedProfile, error]);
+  }, [forceRender, isProfilesLoaded, profiles, selectedProfileId, selectedProfile, error, profileTemperatures]);
   
   // Show loading state until data is loaded
   if (!isProfilesLoaded) {

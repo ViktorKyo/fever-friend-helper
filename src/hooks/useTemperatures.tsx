@@ -18,29 +18,35 @@ export function useTemperatures(selectedProfileId: string | null, isProfilesLoad
     if (!isProfilesLoaded || !selectedProfileId) return;
     
     try {
-      console.log("Loading temperatures from localStorage");
+      console.log("Loading temperatures from localStorage for profile", selectedProfileId);
       
-      // Load temperatures
-      let loadedTemperatures: TemperatureReading[] = [];
-      const savedTemperatures = localStorage.getItem(LOCAL_STORAGE_TEMPS_KEY);
-      
-      if (savedTemperatures) {
-        try {
-          const parsedTemperatures = JSON.parse(savedTemperatures);
-          loadedTemperatures = parsedTemperatures.map((temp: any) => ({
-            ...temp,
-            timestamp: new Date(temp.timestamp)
-          }));
-        } catch (parseError) {
-          console.error("Error parsing temperatures:", parseError);
+      // Add timeout to ensure state updates properly
+      setTimeout(() => {
+        // Load temperatures
+        let loadedTemperatures: TemperatureReading[] = [];
+        const savedTemperatures = localStorage.getItem(LOCAL_STORAGE_TEMPS_KEY);
+        
+        if (savedTemperatures) {
+          try {
+            const parsedTemperatures = JSON.parse(savedTemperatures);
+            loadedTemperatures = parsedTemperatures.map((temp: any) => ({
+              ...temp,
+              timestamp: new Date(temp.timestamp)
+            }));
+          } catch (parseError) {
+            console.error("Error parsing temperatures:", parseError);
+            loadedTemperatures = generateMockReadings(selectedProfileId);
+          }
+        } else {
           loadedTemperatures = generateMockReadings(selectedProfileId);
+          // Save mock data to localStorage
+          localStorage.setItem(LOCAL_STORAGE_TEMPS_KEY, JSON.stringify(loadedTemperatures));
         }
-      } else {
-        loadedTemperatures = generateMockReadings(selectedProfileId);
-      }
-      
-      console.log("Loaded temperatures:", loadedTemperatures);
-      setTemperatures(loadedTemperatures);
+        
+        console.log("Loaded temperatures:", loadedTemperatures);
+        setTemperatures(loadedTemperatures);
+        setIsLoaded(true);
+      }, 100);
     } catch (e) {
       console.error('Error initializing temperatures:', e);
       setError("Failed to load temperature data. Using default values.");
@@ -49,7 +55,6 @@ export function useTemperatures(selectedProfileId: string | null, isProfilesLoad
       if (selectedProfileId) {
         setTemperatures(generateMockReadings(selectedProfileId));
       }
-    } finally {
       setIsLoaded(true);
     }
   }, [isProfilesLoaded, selectedProfileId]);
