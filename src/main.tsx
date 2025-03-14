@@ -20,3 +20,8 @@ root.render(<App />);
 window.addEventListener('error', (event) => {
   console.error('Global error:', event.error);
 });
+
+// Add React error reporting
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('Unhandled Promise Rejection:', event.reason);
+});

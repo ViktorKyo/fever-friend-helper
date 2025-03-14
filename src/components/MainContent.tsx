@@ -19,8 +19,10 @@ const MainContent: React.FC<MainContentProps> = ({
   profileTemperatures,
   onTemperatureSubmit
 }) => {
+  const hasTemperatures = Array.isArray(profileTemperatures) && profileTemperatures.length > 0;
+  
   return (
-    <>
+    <div className="space-y-6">
       <TemperatureInput onSubmit={onTemperatureSubmit} />
       
       {currentTemperature && (
@@ -30,7 +32,7 @@ const MainContent: React.FC<MainContentProps> = ({
         />
       )}
       
-      {profileTemperatures.length > 0 && (
+      {hasTemperatures && (
         <>
           <SymptomTracker 
             childProfile={profile}
@@ -44,7 +46,7 @@ const MainContent: React.FC<MainContentProps> = ({
           />
         </>
       )}
-    </>
+    </div>
   );
 };
 

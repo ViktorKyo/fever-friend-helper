@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useTemperatures } from '@/hooks/useTemperatures';
@@ -32,6 +32,17 @@ const Index = () => {
   // Combine errors for display
   const error = profileError || temperatureError;
   
+  // Debug logs
+  useEffect(() => {
+    console.log('Index rendering with state:', {
+      isProfilesLoaded,
+      profilesLength: profiles.length,
+      selectedProfileId,
+      hasSelectedProfile: !!selectedProfile,
+      hasError: !!error,
+    });
+  }, [isProfilesLoaded, profiles.length, selectedProfileId, selectedProfile, error]);
+  
   // Show loading state until data is loaded
   if (!isProfilesLoaded) {
     return <LoadingState />;
@@ -45,7 +56,7 @@ const Index = () => {
           <p className="text-muted-foreground mt-1">Guidance for parents when fever strikes</p>
         </header>
         
-        {profiles.length > 0 ? (
+        {profiles && profiles.length > 0 ? (
           <>
             <ProfileSection 
               profiles={profiles}
@@ -58,7 +69,7 @@ const Index = () => {
               <MainContent
                 profile={selectedProfile}
                 currentTemperature={currentTemperature}
-                profileTemperatures={profileTemperatures}
+                profileTemperatures={profileTemperatures || []}
                 onTemperatureSubmit={handleTemperatureSubmit}
               />
             )}

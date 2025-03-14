@@ -5,8 +5,9 @@ import Layout from '@/components/Layout';
 const LoadingState: React.FC = () => {
   return (
     <Layout>
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <p className="text-muted-foreground animate-pulse">Loading application data...</p>
+      <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-4">
+        <div className="animate-pulse h-4 w-32 bg-muted rounded"></div>
+        <p className="text-muted-foreground">Loading application data...</p>
       </div>
     </Layout>
   );
