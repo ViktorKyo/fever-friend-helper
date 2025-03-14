@@ -2,8 +2,13 @@
 import React from 'react';
 import Layout from '@/components/Layout';
 import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from 'lucide-react';
 
-const LoadingState: React.FC = () => {
+interface LoadingStateProps {
+  message?: string;
+}
+
+const LoadingState: React.FC<LoadingStateProps> = ({ message = "Loading application data..." }) => {
   return (
     <Layout>
       <div className="space-y-6">
@@ -13,9 +18,12 @@ const LoadingState: React.FC = () => {
         </header>
         
         <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-6">
+          <div className="animate-pulse flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-24 w-full" />
-          <p className="text-muted-foreground">Loading application data...</p>
+          <p className="text-muted-foreground">{message}</p>
         </div>
       </div>
     </Layout>

@@ -8,7 +8,10 @@ import Index from "./pages/Index";
 import History from "./pages/History";
 import Advice from "./pages/Advice";
 import NotFound from "./pages/NotFound";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import ErrorBoundary from "./components/ErrorBoundary";
+import ErrorDisplay from "./components/ErrorDisplay";
+import LoadingState from "./components/LoadingState";
 
 // Create a stable query client instance that won't change on rerenders
 const queryClient = new QueryClient({
@@ -27,27 +30,49 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Add a short timeout to ensure initial rendering occurs
+  useEffect(() => {
+    console.log("App component mounting");
+    // Simulate initial app loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      console.log("App finished initial loading");
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return <LoadingState message="Initializing application..." />;
+  }
+
   return (
     <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <TooltipProvider>
-            <div className="app-container flex flex-col min-h-screen w-full bg-background">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/history" element={<History />} />
-                <Route path="/advice" element={<Advice />} />
-                <Route path="/404" element={<NotFound />} />
-                <Route path="*" element={<Navigate to="/404" replace />} />
-              </Routes>
-              
-              {/* Toast components for notifications */}
-              <Toaster />
-              <Sonner />
-            </div>
-          </TooltipProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <TooltipProvider>
+              <div className="app-container flex flex-col min-h-screen w-full bg-background">
+                <ErrorBoundary>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/history" element={<History />} />
+                    <Route path="/advice" element={<Advice />} />
+                    <Route path="/404" element={<NotFound />} />
+                    <Route path="*" element={<Navigate to="/404" replace />} />
+                  </Routes>
+                </ErrorBoundary>
+                
+                {/* Toast components for notifications */}
+                <Toaster />
+                <Sonner />
+              </div>
+            </TooltipProvider>
+          </BrowserRouter>
+        </QueryClientProvider>
+      </ErrorBoundary>
     </React.StrictMode>
   );
 };
