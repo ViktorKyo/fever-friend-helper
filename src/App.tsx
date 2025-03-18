@@ -19,11 +19,6 @@ const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: false,
       staleTime: 1000 * 60 * 5, // 5 minutes
-      meta: {
-        onError: (error: Error) => {
-          console.error('Query error:', error);
-        }
-      }
     },
   },
 });
@@ -34,11 +29,10 @@ const App = () => {
   // Add a short timeout to ensure initial rendering occurs
   useEffect(() => {
     console.log("App component mounting");
-    // Simulate initial app loading
     const timer = setTimeout(() => {
       setIsLoading(false);
       console.log("App finished initial loading");
-    }, 800); // Increased timeout for more reliable loading
+    }, 300);
     
     return () => clearTimeout(timer);
   }, []);
@@ -48,31 +42,27 @@ const App = () => {
   }
 
   return (
-    <React.StrictMode>
-      <ErrorBoundary fullPage>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <BrowserRouter>
-              <div className="app-container flex flex-col min-h-screen w-full bg-background">
-                <ErrorBoundary fullPage>
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/history" element={<History />} />
-                    <Route path="/advice" element={<Advice />} />
-                    <Route path="/404" element={<NotFound />} />
-                    <Route path="*" element={<Navigate to="/404" replace />} />
-                  </Routes>
-                </ErrorBoundary>
-                
-                {/* Toast components for notifications */}
-                <Toaster />
-                <Sonner />
-              </div>
-            </BrowserRouter>
-          </TooltipProvider>
-        </QueryClientProvider>
-      </ErrorBoundary>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <BrowserRouter>
+          <div className="app-container flex flex-col min-h-screen w-full bg-background">
+            <ErrorBoundary fullPage>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/history" element={<History />} />
+                <Route path="/advice" element={<Advice />} />
+                <Route path="/404" element={<NotFound />} />
+                <Route path="*" element={<Navigate to="/404" replace />} />
+              </Routes>
+            </ErrorBoundary>
+            
+            {/* Toast components for notifications */}
+            <Toaster />
+            <Sonner />
+          </div>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 };
 
