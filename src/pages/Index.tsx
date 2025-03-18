@@ -67,7 +67,7 @@ const Index = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="space-y-6 w-full">
         <header className="text-center mb-6">
           <h1 className="text-3xl font-bold tracking-tight text-primary">Fever Friend</h1>
           <p className="text-muted-foreground mt-1">Guidance for parents when fever strikes</p>
@@ -75,10 +75,10 @@ const Index = () => {
         
         {error && <ErrorDisplay error={error} />}
         
-        <div className="content-container bg-gray-50 p-4 rounded-lg">
+        <div className="content-container bg-gray-50 p-4 rounded-lg w-full">
           {profiles && profiles.length > 0 ? (
             <>
-              <div className="profile-section mb-6 bg-white p-4 rounded-lg shadow-sm">
+              <div className="profile-section mb-6 bg-white p-4 rounded-lg shadow-sm w-full">
                 <ProfileSection 
                   profiles={profiles}
                   selectedProfileId={selectedProfileId || ''}
@@ -88,7 +88,7 @@ const Index = () => {
               </div>
               
               {selectedProfile && (
-                <div className="main-content-section">
+                <div className="main-content-section w-full">
                   <MainContent
                     profile={selectedProfile}
                     currentTemperature={currentTemperature}
@@ -99,7 +99,7 @@ const Index = () => {
               )}
             </>
           ) : (
-            <div className="empty-state-container bg-white p-6 rounded-lg shadow-sm">
+            <div className="empty-state-container bg-white p-6 rounded-lg shadow-sm w-full">
               <EmptyProfileState onCreateDefaultProfile={createNewDefaultProfile} />
             </div>
           )}

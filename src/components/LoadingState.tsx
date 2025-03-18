@@ -28,9 +28,9 @@ const LoadingState: React.FC<LoadingStateProps> = ({
   }
 
   return (
-    <div className="bg-background text-foreground">
+    <div className="bg-background text-foreground w-full">
       <div className="container max-w-screen-md mx-auto px-4 pb-12 pt-8">
-        <div className="space-y-6">
+        <div className="space-y-6 w-full">
           <header className="text-center mb-8">
             <h1 className="text-3xl font-bold tracking-tight text-primary">Fever Friend</h1>
             <p className="text-muted-foreground mt-1">Guidance for parents when fever strikes</p>
