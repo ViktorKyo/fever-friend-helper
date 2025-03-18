@@ -10,7 +10,7 @@ import ProfileSection from '@/components/ProfileSection';
 import MainContent from '@/components/MainContent';
 
 const Index = () => {
-  const [isInitializing, setIsInitializing] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Use our custom hooks for state management
   const {
@@ -34,21 +34,23 @@ const Index = () => {
   // Combine errors for display
   const error = profileError || temperatureError;
   
-  // Ensure we're done initializing after a short delay
+  // Set loading state
   useEffect(() => {
-    console.log('Index component mounting');
-    const timer = setTimeout(() => {
-      setIsInitializing(false);
-      console.log('Index finished initializing');
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, []);
+    console.log('Index mounting', { isProfilesLoaded });
+    if (isProfilesLoaded) {
+      // Short timeout to ensure DOM updates
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+        console.log('Index finished loading');
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isProfilesLoaded]);
 
   // Debug logs
   useEffect(() => {
     console.log('Index rendering with state:', {
-      isInitializing,
+      isLoading,
       isProfilesLoaded,
       profilesLength: profiles?.length || 0,
       selectedProfileId,
@@ -56,13 +58,13 @@ const Index = () => {
       hasError: !!error,
       temperatureReadings: profileTemperatures?.length || 0,
       currentTemperature: !!currentTemperature,
-      visibleState: !isInitializing && isProfilesLoaded ? 'should show content' : 'loading',
+      visibleState: isLoading ? 'loading' : 'content',
     });
-  }, [isInitializing, isProfilesLoaded, profiles, selectedProfileId, selectedProfile, error, profileTemperatures, currentTemperature]);
+  }, [isLoading, isProfilesLoaded, profiles, selectedProfileId, selectedProfile, error, profileTemperatures, currentTemperature]);
   
-  // Show loading state until data is loaded
-  if (isInitializing || !isProfilesLoaded) {
-    return <LoadingState message={isInitializing ? "Initializing..." : "Loading profile data..."} />;
+  // Show loading state
+  if (isLoading) {
+    return <LoadingState message="Loading profile data..." />;
   }
 
   return (
@@ -75,12 +77,10 @@ const Index = () => {
         
         {error && <ErrorDisplay error={error} />}
         
-        <div className="content-container border-2 border-blue-200 p-4 rounded-lg">
-          <p className="text-center mb-4 text-blue-500">Content Debug Area</p>
-          
+        <div className="content-container bg-gray-50 p-6 rounded-lg">
           {profiles && profiles.length > 0 ? (
             <>
-              <div className="profile-section mb-6 border border-green-200 p-2 rounded">
+              <div className="profile-section mb-6 bg-white p-4 rounded-lg shadow-sm">
                 <ProfileSection 
                   profiles={profiles}
                   selectedProfileId={selectedProfileId || ''}
@@ -90,7 +90,7 @@ const Index = () => {
               </div>
               
               {selectedProfile && (
-                <div className="main-content-section border border-purple-200 p-2 rounded">
+                <div className="main-content-section">
                   <MainContent
                     profile={selectedProfile}
                     currentTemperature={currentTemperature}
@@ -101,7 +101,7 @@ const Index = () => {
               )}
             </>
           ) : (
-            <div className="empty-state-container border border-yellow-200 p-2 rounded">
+            <div className="empty-state-container bg-white p-6 rounded-lg shadow-sm">
               <EmptyProfileState onCreateDefaultProfile={createNewDefaultProfile} />
             </div>
           )}

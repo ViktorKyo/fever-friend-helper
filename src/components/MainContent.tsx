@@ -5,6 +5,7 @@ import AdviceDisplay from '@/components/AdviceDisplay';
 import TemperatureHistory from '@/components/TemperatureHistory';
 import SymptomTracker from '@/components/SymptomTracker';
 import { ChildProfile as ChildProfileType, Temperature, TemperatureReading } from '@/lib/feverGuide';
+import LoadingState from './LoadingState';
 
 interface MainContentProps {
   profile: ChildProfileType;
@@ -30,14 +31,20 @@ const MainContent: React.FC<MainContentProps> = ({
     temperatureCount: profileTemperatures?.length
   });
   
+  if (!profile) {
+    return <LoadingState inline message="Waiting for profile data..." />;
+  }
+  
   return (
     <div className="space-y-6">
-      <div className="temperature-input-section border border-blue-100 p-2 rounded">
+      <div className="temperature-input-section bg-white border p-4 rounded-lg shadow-sm">
+        <h2 className="text-lg font-medium mb-3">Record Temperature</h2>
         <TemperatureInput onSubmit={onTemperatureSubmit} />
       </div>
       
       {currentTemperature && (
-        <div className="advice-section border border-green-100 p-2 rounded">
+        <div className="advice-section bg-white border p-4 rounded-lg shadow-sm">
+          <h2 className="text-lg font-medium mb-3">Fever Advice</h2>
           <AdviceDisplay 
             temperature={currentTemperature}
             childProfile={profile}
@@ -47,14 +54,16 @@ const MainContent: React.FC<MainContentProps> = ({
       
       {hasTemperatures && (
         <>
-          <div className="symptom-tracker-section border border-orange-100 p-2 rounded">
+          <div className="symptom-tracker-section bg-white border p-4 rounded-lg shadow-sm">
+            <h2 className="text-lg font-medium mb-3">Symptom Tracker</h2>
             <SymptomTracker 
               childProfile={profile}
               readings={profileTemperatures}
             />
           </div>
           
-          <div className="temperature-history-section border border-purple-100 p-2 rounded">
+          <div className="temperature-history-section bg-white border p-4 rounded-lg shadow-sm">
+            <h2 className="text-lg font-medium mb-3">Recent Readings</h2>
             <TemperatureHistory
               readings={profileTemperatures}
               childProfile={profile}
