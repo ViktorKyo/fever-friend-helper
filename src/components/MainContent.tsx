@@ -32,7 +32,7 @@ const MainContent: React.FC<MainContentProps> = ({
   });
   
   if (!profile) {
-    return <LoadingState inline message="Waiting for profile data..." />;
+    return <LoadingState inline message="Loading profile data..." />;
   }
   
   return (

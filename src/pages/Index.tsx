@@ -10,7 +10,7 @@ import ProfileSection from '@/components/ProfileSection';
 import MainContent from '@/components/MainContent';
 
 const Index = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingInitial, setIsLoadingInitial] = useState(true);
   
   // Use our custom hooks for state management
   const {
@@ -37,47 +37,45 @@ const Index = () => {
   // Set loading state
   useEffect(() => {
     console.log('Index mounting', { isProfilesLoaded });
+    // Only show initial loading state briefly
     if (isProfilesLoaded) {
-      // Short timeout to ensure DOM updates
+      // Set a brief timeout to allow data to load
       const timer = setTimeout(() => {
-        setIsLoading(false);
-        console.log('Index finished loading');
+        setIsLoadingInitial(false);
+        console.log('Index finished loading - showing content');
       }, 100);
       return () => clearTimeout(timer);
     }
   }, [isProfilesLoaded]);
 
   // Debug logs
-  useEffect(() => {
-    console.log('Index rendering with state:', {
-      isLoading,
-      isProfilesLoaded,
-      profilesLength: profiles?.length || 0,
-      selectedProfileId,
-      hasSelectedProfile: !!selectedProfile,
-      hasError: !!error,
-      temperatureReadings: profileTemperatures?.length || 0,
-      currentTemperature: !!currentTemperature,
-      visibleState: isLoading ? 'loading' : 'content',
-    });
-  }, [isLoading, isProfilesLoaded, profiles, selectedProfileId, selectedProfile, error, profileTemperatures, currentTemperature]);
+  console.log('Index rendering with state:', {
+    isLoadingInitial,
+    isProfilesLoaded,
+    profilesLength: profiles?.length || 0,
+    selectedProfileId,
+    hasSelectedProfile: !!selectedProfile,
+    hasError: !!error,
+    temperatureReadings: profileTemperatures?.length || 0,
+    currentTemperature: !!currentTemperature,
+  });
   
-  // Show loading state
-  if (isLoading) {
-    return <LoadingState message="Loading profile data..." />;
+  // Show loading state only for the initial load
+  if (isLoadingInitial) {
+    return <LoadingState message="Loading your data..." />;
   }
 
   return (
     <Layout>
       <div className="space-y-6">
-        <header className="text-center mb-8">
+        <header className="text-center mb-6">
           <h1 className="text-3xl font-bold tracking-tight text-primary">Fever Friend</h1>
           <p className="text-muted-foreground mt-1">Guidance for parents when fever strikes</p>
         </header>
         
         {error && <ErrorDisplay error={error} />}
         
-        <div className="content-container bg-gray-50 p-6 rounded-lg">
+        <div className="content-container bg-gray-50 p-4 rounded-lg">
           {profiles && profiles.length > 0 ? (
             <>
               <div className="profile-section mb-6 bg-white p-4 rounded-lg shadow-sm">
