@@ -44,7 +44,7 @@ const Index = () => {
     
     return () => clearTimeout(timer);
   }, []);
-  
+
   // Debug logs
   useEffect(() => {
     console.log('Index rendering with state:', {
@@ -56,6 +56,7 @@ const Index = () => {
       hasError: !!error,
       temperatureReadings: profileTemperatures?.length || 0,
       currentTemperature: !!currentTemperature,
+      visibleState: !isInitializing && isProfilesLoaded ? 'should show content' : 'loading',
     });
   }, [isInitializing, isProfilesLoaded, profiles, selectedProfileId, selectedProfile, error, profileTemperatures, currentTemperature]);
   
@@ -74,27 +75,37 @@ const Index = () => {
         
         {error && <ErrorDisplay error={error} />}
         
-        {profiles && profiles.length > 0 ? (
-          <>
-            <ProfileSection 
-              profiles={profiles}
-              selectedProfileId={selectedProfileId || ''}
-              onProfileSelect={handleProfileSelect}
-              onProfileAdd={handleProfileAdd}
-            />
-            
-            {selectedProfile && (
-              <MainContent
-                profile={selectedProfile}
-                currentTemperature={currentTemperature}
-                profileTemperatures={profileTemperatures || []}
-                onTemperatureSubmit={handleTemperatureSubmit}
-              />
-            )}
-          </>
-        ) : (
-          <EmptyProfileState onCreateDefaultProfile={createNewDefaultProfile} />
-        )}
+        <div className="content-container border-2 border-blue-200 p-4 rounded-lg">
+          <p className="text-center mb-4 text-blue-500">Content Debug Area</p>
+          
+          {profiles && profiles.length > 0 ? (
+            <>
+              <div className="profile-section mb-6 border border-green-200 p-2 rounded">
+                <ProfileSection 
+                  profiles={profiles}
+                  selectedProfileId={selectedProfileId || ''}
+                  onProfileSelect={handleProfileSelect}
+                  onProfileAdd={handleProfileAdd}
+                />
+              </div>
+              
+              {selectedProfile && (
+                <div className="main-content-section border border-purple-200 p-2 rounded">
+                  <MainContent
+                    profile={selectedProfile}
+                    currentTemperature={currentTemperature}
+                    profileTemperatures={profileTemperatures || []}
+                    onTemperatureSubmit={handleTemperatureSubmit}
+                  />
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="empty-state-container border border-yellow-200 p-2 rounded">
+              <EmptyProfileState onCreateDefaultProfile={createNewDefaultProfile} />
+            </div>
+          )}
+        </div>
       </div>
     </Layout>
   );

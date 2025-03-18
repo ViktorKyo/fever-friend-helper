@@ -8,9 +8,8 @@ import Index from "./pages/Index";
 import History from "./pages/History";
 import Advice from "./pages/Advice";
 import NotFound from "./pages/NotFound";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
-import LoadingState from "./components/LoadingState";
 
 // Create a stable query client instance that won't change on rerenders
 const queryClient = new QueryClient({
@@ -24,23 +23,8 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  console.log("App component rendering");
   
-  // Add a short timeout to ensure initial rendering occurs
-  useEffect(() => {
-    console.log("App component mounting");
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-      console.log("App finished initial loading");
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return <LoadingState message="Initializing application..." />;
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

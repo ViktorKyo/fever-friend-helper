@@ -8,6 +8,8 @@ interface LoadingStateProps {
 }
 
 const LoadingState: React.FC<LoadingStateProps> = ({ message = "Loading application data..." }) => {
+  console.log('LoadingState rendering with message:', message);
+  
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <div className="flex-1 container max-w-screen-md mx-auto px-4 pb-24 pt-8 md:pt-12">
@@ -17,13 +19,12 @@ const LoadingState: React.FC<LoadingStateProps> = ({ message = "Loading applicat
             <p className="text-muted-foreground mt-1">Guidance for parents when fever strikes</p>
           </header>
           
-          <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-6">
+          <div className="flex flex-col items-center justify-center min-h-[20vh] space-y-6 border border-red-200 p-4 rounded">
             <div className="animate-pulse flex items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-24 w-full" />
             <p className="text-muted-foreground">{message}</p>
+            <p className="text-xs text-muted-foreground">(Loading component active)</p>
           </div>
         </div>
       </div>

@@ -21,29 +21,46 @@ const MainContent: React.FC<MainContentProps> = ({
 }) => {
   const hasTemperatures = Array.isArray(profileTemperatures) && profileTemperatures.length > 0;
   
+  console.log('MainContent rendering with:', {
+    hasProfile: !!profile,
+    profileName: profile?.name,
+    hasCurrentTemp: !!currentTemperature,
+    currentTemp: currentTemperature?.value,
+    hasTemperatures,
+    temperatureCount: profileTemperatures?.length
+  });
+  
   return (
     <div className="space-y-6">
-      <TemperatureInput onSubmit={onTemperatureSubmit} />
+      <div className="temperature-input-section border border-blue-100 p-2 rounded">
+        <TemperatureInput onSubmit={onTemperatureSubmit} />
+      </div>
       
       {currentTemperature && (
-        <AdviceDisplay 
-          temperature={currentTemperature}
-          childProfile={profile}
-        />
+        <div className="advice-section border border-green-100 p-2 rounded">
+          <AdviceDisplay 
+            temperature={currentTemperature}
+            childProfile={profile}
+          />
+        </div>
       )}
       
       {hasTemperatures && (
         <>
-          <SymptomTracker 
-            childProfile={profile}
-            readings={profileTemperatures}
-          />
+          <div className="symptom-tracker-section border border-orange-100 p-2 rounded">
+            <SymptomTracker 
+              childProfile={profile}
+              readings={profileTemperatures}
+            />
+          </div>
           
-          <TemperatureHistory
-            readings={profileTemperatures}
-            childProfile={profile}
-            limit={3}
-          />
+          <div className="temperature-history-section border border-purple-100 p-2 rounded">
+            <TemperatureHistory
+              readings={profileTemperatures}
+              childProfile={profile}
+              limit={3}
+            />
+          </div>
         </>
       )}
     </div>
