@@ -15,11 +15,11 @@ const LoadingState: React.FC<LoadingStateProps> = ({
   console.log('LoadingState rendering with message:', message, 'inline:', inline);
   
   const loadingContent = (
-    <div className={`flex flex-col items-center justify-center space-y-4 p-4 rounded ${inline ? 'min-h-[150px]' : 'min-h-[300px]'} w-full`}>
+    <div className={`flex flex-col items-center justify-center space-y-4 p-6 bg-white rounded-lg shadow-sm ${inline ? 'min-h-[200px]' : 'min-h-[400px]'} w-full`}>
       <div className="animate-pulse flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
-      <p className="text-muted-foreground">{message}</p>
+      <p className="text-muted-foreground text-center">{message}</p>
     </div>
   );
 
@@ -28,9 +28,9 @@ const LoadingState: React.FC<LoadingStateProps> = ({
   }
 
   return (
-    <div className="bg-background text-foreground w-full min-h-[60vh] flex flex-col justify-center">
-      <div className="container max-w-screen-md mx-auto px-4 pb-12 pt-8">
-        <div className="space-y-6 w-full">
+    <div className="bg-background text-foreground w-full min-h-[80vh] flex flex-col justify-center">
+      <div className="container max-w-screen-md mx-auto px-4 pb-12 pt-8 flex-1 flex flex-col justify-center">
+        <div className="space-y-8 w-full">
           <header className="text-center mb-8">
             <h1 className="text-3xl font-bold tracking-tight text-primary">Fever Friend</h1>
             <p className="text-muted-foreground mt-1">Guidance for parents when fever strikes</p>

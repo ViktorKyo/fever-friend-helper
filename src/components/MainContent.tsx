@@ -36,15 +36,17 @@ const MainContent: React.FC<MainContentProps> = ({
   }
   
   return (
-    <div className="space-y-6 w-full flex flex-col">
-      <div className="temperature-input-section bg-white border p-4 rounded-lg shadow-sm w-full min-h-[150px]">
-        <h2 className="text-lg font-medium mb-3">Record Temperature</h2>
-        <TemperatureInput onSubmit={onTemperatureSubmit} />
+    <div className="space-y-8 w-full flex-1 flex flex-col">
+      <div className="temperature-input-section bg-white border p-6 rounded-lg shadow-sm w-full min-h-[200px] flex flex-col">
+        <h2 className="text-xl font-semibold mb-4">Record Temperature</h2>
+        <div className="flex-1 flex items-center">
+          <TemperatureInput onSubmit={onTemperatureSubmit} />
+        </div>
       </div>
       
       {currentTemperature && (
-        <div className="advice-section bg-white border p-4 rounded-lg shadow-sm w-full min-h-[200px]">
-          <h2 className="text-lg font-medium mb-3">Fever Advice</h2>
+        <div className="advice-section bg-white border p-6 rounded-lg shadow-sm w-full min-h-[250px]">
+          <h2 className="text-xl font-semibold mb-4">Fever Advice</h2>
           <AdviceDisplay 
             temperature={currentTemperature}
             childProfile={profile}
@@ -54,16 +56,16 @@ const MainContent: React.FC<MainContentProps> = ({
       
       {hasTemperatures && (
         <>
-          <div className="symptom-tracker-section bg-white border p-4 rounded-lg shadow-sm w-full min-h-[200px]">
-            <h2 className="text-lg font-medium mb-3">Symptom Tracker</h2>
+          <div className="symptom-tracker-section bg-white border p-6 rounded-lg shadow-sm w-full min-h-[250px]">
+            <h2 className="text-xl font-semibold mb-4">Symptom Tracker</h2>
             <SymptomTracker 
               childProfile={profile}
               readings={profileTemperatures}
             />
           </div>
           
-          <div className="temperature-history-section bg-white border p-4 rounded-lg shadow-sm w-full min-h-[200px]">
-            <h2 className="text-lg font-medium mb-3">Recent Readings</h2>
+          <div className="temperature-history-section bg-white border p-6 rounded-lg shadow-sm w-full min-h-[250px]">
+            <h2 className="text-xl font-semibold mb-4">Recent Readings</h2>
             <TemperatureHistory
               readings={profileTemperatures}
               childProfile={profile}
