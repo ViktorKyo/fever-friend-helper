@@ -36,42 +36,40 @@ const MainContent: React.FC<MainContentProps> = ({
   }
   
   return (
-    <div className="space-y-8 w-full flex-1 flex flex-col">
-      <div className="temperature-input-section bg-white border p-6 rounded-lg shadow-sm w-full min-h-[200px] flex flex-col">
+    <div className="space-y-6 flex flex-col w-full">
+      <section className="bg-white border rounded-lg shadow-sm p-5">
         <h2 className="text-xl font-semibold mb-4">Record Temperature</h2>
-        <div className="flex-1 flex items-center">
-          <TemperatureInput onSubmit={onTemperatureSubmit} />
-        </div>
-      </div>
+        <TemperatureInput onSubmit={onTemperatureSubmit} />
+      </section>
       
       {currentTemperature && (
-        <div className="advice-section bg-white border p-6 rounded-lg shadow-sm w-full min-h-[250px]">
+        <section className="bg-white border rounded-lg shadow-sm p-5">
           <h2 className="text-xl font-semibold mb-4">Fever Advice</h2>
           <AdviceDisplay 
             temperature={currentTemperature}
             childProfile={profile}
           />
-        </div>
+        </section>
       )}
       
       {hasTemperatures && (
         <>
-          <div className="symptom-tracker-section bg-white border p-6 rounded-lg shadow-sm w-full min-h-[250px]">
+          <section className="bg-white border rounded-lg shadow-sm p-5">
             <h2 className="text-xl font-semibold mb-4">Symptom Tracker</h2>
             <SymptomTracker 
               childProfile={profile}
               readings={profileTemperatures}
             />
-          </div>
+          </section>
           
-          <div className="temperature-history-section bg-white border p-6 rounded-lg shadow-sm w-full min-h-[250px]">
+          <section className="bg-white border rounded-lg shadow-sm p-5">
             <h2 className="text-xl font-semibold mb-4">Recent Readings</h2>
             <TemperatureHistory
               readings={profileTemperatures}
               childProfile={profile}
               limit={3}
             />
-          </div>
+          </section>
         </>
       )}
     </div>

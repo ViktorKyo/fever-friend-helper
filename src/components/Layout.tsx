@@ -12,13 +12,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <main className="flex-1 flex flex-col w-full container max-w-screen-md mx-auto px-4 pb-24 pt-8 md:pt-12">
+    <div className="min-h-screen flex flex-col" style={{ minHeight: '100dvh' }}>
+      <main className="flex-1 container mx-auto px-4 pt-8 pb-20" style={{ overflowY: 'auto' }}>
         {children}
       </main>
       
-      <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border py-2 px-4 z-50">
-        <div className="container max-w-screen-md mx-auto">
+      <nav className="fixed bottom-0 left-0 w-full bg-background border-t border-border py-2 z-50">
+        <div className="container mx-auto">
           <ul className="flex justify-around items-center">
             <li>
               <NavLink to="/" active={location.pathname === '/'}>

@@ -37,15 +37,17 @@ const Index = () => {
   // Set loading state
   useEffect(() => {
     console.log('Index mounting', { isProfilesLoaded });
-    // Only show initial loading state briefly
     if (isProfilesLoaded) {
-      // Set a brief timeout to allow data to load
-      const timer = setTimeout(() => {
+      // Directly set to loaded after a very short delay
+      setTimeout(() => {
         setIsLoadingInitial(false);
         console.log('Index finished loading - showing content');
-      }, 300); // Increased timeout for better data loading
-      return () => clearTimeout(timer);
+      }, 500);
     }
+    
+    return () => {
+      console.log('Index unmounting');
+    };
   }, [isProfilesLoaded]);
 
   // Debug logs
@@ -60,50 +62,46 @@ const Index = () => {
     currentTemperature: !!currentTemperature,
   });
   
-  // Show loading state only for the initial load
+  // Show full-page loading state only for the initial load
   if (isLoadingInitial) {
     return <LoadingState message="Loading your data..." />;
   }
 
   return (
     <Layout>
-      <div className="space-y-8 w-full flex-1 flex flex-col min-h-[80vh]">
-        <header className="text-center mb-8">
+      <div className="w-full">
+        <header className="text-center mb-6">
           <h1 className="text-3xl font-bold tracking-tight text-primary">Fever Friend</h1>
           <p className="text-muted-foreground mt-2">Guidance for parents when fever strikes</p>
         </header>
         
         {error && <ErrorDisplay error={error} />}
         
-        <div className="content-container bg-gray-50 p-6 rounded-lg shadow-sm w-full flex-1 flex flex-col">
-          {profiles && profiles.length > 0 ? (
-            <>
-              <div className="profile-section mb-8 bg-white p-6 rounded-lg shadow-sm w-full">
-                <ProfileSection 
-                  profiles={profiles}
-                  selectedProfileId={selectedProfileId || ''}
-                  onProfileSelect={handleProfileSelect}
-                  onProfileAdd={handleProfileAdd}
-                />
-              </div>
-              
-              {selectedProfile && (
-                <div className="main-content-section w-full flex-1 flex flex-col">
-                  <MainContent
-                    profile={selectedProfile}
-                    currentTemperature={currentTemperature}
-                    profileTemperatures={profileTemperatures || []}
-                    onTemperatureSubmit={handleTemperatureSubmit}
-                  />
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="empty-state-container bg-white p-8 rounded-lg shadow-sm w-full flex-1 flex items-center justify-center">
-              <EmptyProfileState onCreateDefaultProfile={createNewDefaultProfile} />
+        {profiles && profiles.length > 0 ? (
+          <>
+            <div className="bg-white p-4 rounded-lg shadow-sm mb-6 border">
+              <ProfileSection 
+                profiles={profiles}
+                selectedProfileId={selectedProfileId || ''}
+                onProfileSelect={handleProfileSelect}
+                onProfileAdd={handleProfileAdd}
+              />
             </div>
-          )}
-        </div>
+            
+            {selectedProfile && (
+              <MainContent
+                profile={selectedProfile}
+                currentTemperature={currentTemperature}
+                profileTemperatures={profileTemperatures || []}
+                onTemperatureSubmit={handleTemperatureSubmit}
+              />
+            )}
+          </>
+        ) : (
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <EmptyProfileState onCreateDefaultProfile={createNewDefaultProfile} />
+          </div>
+        )}
       </div>
     </Layout>
   );

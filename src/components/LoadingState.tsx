@@ -14,30 +14,21 @@ const LoadingState: React.FC<LoadingStateProps> = ({
 }) => {
   console.log('LoadingState rendering with message:', message, 'inline:', inline);
   
-  const loadingContent = (
-    <div className={`flex flex-col items-center justify-center space-y-4 p-6 bg-white rounded-lg shadow-sm ${inline ? 'min-h-[200px]' : 'min-h-[400px]'} w-full`}>
-      <div className="animate-pulse flex items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      </div>
-      <p className="text-muted-foreground text-center">{message}</p>
-    </div>
-  );
-
   if (inline) {
-    return loadingContent;
+    return (
+      <div className="bg-white rounded-lg shadow border p-8 flex flex-col items-center justify-center w-full" style={{ minHeight: '200px' }}>
+        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground text-center">{message}</p>
+      </div>
+    );
   }
 
   return (
-    <div className="bg-background text-foreground w-full min-h-[80vh] flex flex-col justify-center">
-      <div className="container max-w-screen-md mx-auto px-4 pb-12 pt-8 flex-1 flex flex-col justify-center">
-        <div className="space-y-8 w-full">
-          <header className="text-center mb-8">
-            <h1 className="text-3xl font-bold tracking-tight text-primary">Fever Friend</h1>
-            <p className="text-muted-foreground mt-1">Guidance for parents when fever strikes</p>
-          </header>
-          
-          {loadingContent}
-        </div>
+    <div className="absolute inset-0 bg-background flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-md border p-8 w-full max-w-md flex flex-col items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary mb-6" />
+        <h2 className="text-xl font-semibold text-primary mb-2">Fever Friend</h2>
+        <p className="text-muted-foreground text-center">{message}</p>
       </div>
     </div>
   );
