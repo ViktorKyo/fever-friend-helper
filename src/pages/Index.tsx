@@ -10,6 +10,7 @@ import ProfileSection from '@/components/ProfileSection';
 import MainContent from '@/components/MainContent';
 
 const Index = () => {
+  // Use more stable state approach with loading
   const [isLoadingInitial, setIsLoadingInitial] = useState(true);
   
   // Use our custom hooks for state management
@@ -34,18 +35,28 @@ const Index = () => {
   // Combine errors for display
   const error = profileError || temperatureError;
   
-  // Set loading state
+  // Set loading state with a more reliable approach
   useEffect(() => {
     console.log('Index mounting', { isProfilesLoaded });
+    let mounted = true;
+    
     if (isProfilesLoaded) {
-      // Directly set to loaded after a very short delay
-      setTimeout(() => {
-        setIsLoadingInitial(false);
-        console.log('Index finished loading - showing content');
-      }, 500);
+      // Add a slightly longer delay to ensure data is properly loaded
+      const timer = setTimeout(() => {
+        if (mounted) {
+          setIsLoadingInitial(false);
+          console.log('Index finished loading - showing content');
+        }
+      }, 1000);
+      
+      return () => {
+        mounted = false;
+        clearTimeout(timer);
+      };
     }
     
     return () => {
+      mounted = false;
       console.log('Index unmounting');
     };
   }, [isProfilesLoaded]);
@@ -69,8 +80,8 @@ const Index = () => {
 
   return (
     <Layout>
-      <div className="w-full">
-        <header className="text-center mb-6">
+      <div className="flex flex-col w-full">
+        <header className="text-center mb-6 mt-2">
           <h1 className="text-3xl font-bold tracking-tight text-primary">Fever Friend</h1>
           <p className="text-muted-foreground mt-2">Guidance for parents when fever strikes</p>
         </header>
@@ -79,7 +90,7 @@ const Index = () => {
         
         {profiles && profiles.length > 0 ? (
           <>
-            <div className="bg-white p-4 rounded-lg shadow-sm mb-6 border">
+            <div className="bg-white p-4 rounded-lg shadow-md mb-6 border">
               <ProfileSection 
                 profiles={profiles}
                 selectedProfileId={selectedProfileId || ''}
@@ -98,7 +109,7 @@ const Index = () => {
             )}
           </>
         ) : (
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="bg-white p-6 rounded-lg shadow-md border">
             <EmptyProfileState onCreateDefaultProfile={createNewDefaultProfile} />
           </div>
         )}

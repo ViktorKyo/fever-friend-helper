@@ -12,8 +12,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   
   return (
-    <div className="min-h-screen flex flex-col" style={{ minHeight: '100dvh' }}>
-      <main className="flex-1 container mx-auto px-4 pt-8 pb-20" style={{ overflowY: 'auto' }}>
+    <div className="flex flex-col min-h-[100dvh] w-full bg-background">
+      <main className="flex-1 container mx-auto px-4 pt-4 pb-20 overflow-y-auto">
         {children}
       </main>
       

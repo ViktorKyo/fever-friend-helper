@@ -13,7 +13,7 @@ if (!rootElement) {
 
 const root = createRoot(rootElement);
 
-// Render the app without StrictMode (already in App.tsx)
+// Render the app once without any async behavior
 root.render(<App />);
 
 // Handle unhandled errors

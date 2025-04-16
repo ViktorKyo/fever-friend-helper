@@ -36,14 +36,14 @@ const MainContent: React.FC<MainContentProps> = ({
   }
   
   return (
-    <div className="space-y-6 flex flex-col w-full">
-      <section className="bg-white border rounded-lg shadow-sm p-5">
+    <div className="space-y-6 w-full">
+      <section className="bg-white border rounded-lg shadow-md p-5">
         <h2 className="text-xl font-semibold mb-4">Record Temperature</h2>
         <TemperatureInput onSubmit={onTemperatureSubmit} />
       </section>
       
       {currentTemperature && (
-        <section className="bg-white border rounded-lg shadow-sm p-5">
+        <section className="bg-white border rounded-lg shadow-md p-5">
           <h2 className="text-xl font-semibold mb-4">Fever Advice</h2>
           <AdviceDisplay 
             temperature={currentTemperature}
@@ -54,7 +54,7 @@ const MainContent: React.FC<MainContentProps> = ({
       
       {hasTemperatures && (
         <>
-          <section className="bg-white border rounded-lg shadow-sm p-5">
+          <section className="bg-white border rounded-lg shadow-md p-5">
             <h2 className="text-xl font-semibold mb-4">Symptom Tracker</h2>
             <SymptomTracker 
               childProfile={profile}
@@ -62,7 +62,7 @@ const MainContent: React.FC<MainContentProps> = ({
             />
           </section>
           
-          <section className="bg-white border rounded-lg shadow-sm p-5">
+          <section className="bg-white border rounded-lg shadow-md p-5 mb-8">
             <h2 className="text-xl font-semibold mb-4">Recent Readings</h2>
             <TemperatureHistory
               readings={profileTemperatures}
