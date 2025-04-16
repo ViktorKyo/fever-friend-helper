@@ -10,7 +10,9 @@ import ProfileSection from '@/components/ProfileSection';
 import MainContent from '@/components/MainContent';
 
 const Index = () => {
-  // Prevent unmounting with ref
+  // Use a ref to track if component is mounted
+  const isMounted = useRef(true);
+  // Track initial load completion
   const initialLoadComplete = useRef(false);
   const [isLoadingInitial, setIsLoadingInitial] = useState(true);
   
@@ -40,21 +42,34 @@ const Index = () => {
   useEffect(() => {
     console.log('Index mounting with isProfilesLoaded:', isProfilesLoaded);
     
+    // Only proceed if profiles are loaded and we haven't completed initial load
     if (isProfilesLoaded && !initialLoadComplete.current) {
-      // Use shorter timeout and ref to prevent repeated loading states
+      // Use shorter timeout to prevent perceived lag
       const timer = setTimeout(() => {
-        console.log('Setting isLoadingInitial to false');
-        setIsLoadingInitial(false);
-        initialLoadComplete.current = true;
-      }, 500);
+        if (isMounted.current) {
+          console.log('Setting isLoadingInitial to false');
+          setIsLoadingInitial(false);
+          initialLoadComplete.current = true;
+        }
+      }, 300);
       
       return () => clearTimeout(timer);
     }
     
+    // Cleanup function 
     return () => {
       console.log('Index effect cleanup');
+      isMounted.current = false;
     };
   }, [isProfilesLoaded]);
+
+  // Set isMounted to true when component mounts
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   // Debug logs
   console.log('Index rendering with state:', {

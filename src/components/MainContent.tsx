@@ -36,7 +36,7 @@ const MainContent: React.FC<MainContentProps> = ({
   }
   
   return (
-    <div className="space-y-6 w-full mb-16">
+    <div className="space-y-6 w-full mb-20 relative">
       <section className="bg-white border rounded-lg shadow-md p-5">
         <h2 className="text-xl font-semibold mb-4">Record Temperature</h2>
         <TemperatureInput onSubmit={onTemperatureSubmit} />

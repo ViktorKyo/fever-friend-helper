@@ -12,8 +12,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   
   return (
-    <div className="flex flex-col min-h-[100dvh] bg-background">
-      <main className="flex-1 container mx-auto px-4 pt-4 pb-20 overflow-auto">
+    <div className="flex flex-col min-h-[100dvh] bg-background relative">
+      <main className="flex-1 container mx-auto px-4 pt-4 pb-24 relative">
         {children}
       </main>
       
