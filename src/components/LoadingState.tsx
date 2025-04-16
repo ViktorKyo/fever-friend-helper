@@ -24,7 +24,7 @@ const LoadingState: React.FC<LoadingStateProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 z-50 bg-background/95">
+    <div className="fixed inset-0 flex items-center justify-center p-4 z-[9999] bg-background/95">
       <div className="bg-white rounded-lg shadow-lg border p-8 max-w-md mx-auto flex flex-col items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-6" />
         <h2 className="text-xl font-semibold text-primary mb-2">Fever Friend</h2>

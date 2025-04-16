@@ -38,38 +38,48 @@ const Index = () => {
   // Combine errors for display
   const error = profileError || temperatureError;
   
-  // Set loading state with a more reliable approach
-  useEffect(() => {
-    console.log('Index mounting with isProfilesLoaded:', isProfilesLoaded);
-    
-    // Only proceed if profiles are loaded and we haven't completed initial load
-    if (isProfilesLoaded && !initialLoadComplete.current) {
-      // Use shorter timeout to prevent perceived lag
-      const timer = setTimeout(() => {
-        if (isMounted.current) {
-          console.log('Setting isLoadingInitial to false');
-          setIsLoadingInitial(false);
-          initialLoadComplete.current = true;
-        }
-      }, 300);
-      
-      return () => clearTimeout(timer);
-    }
-    
-    // Cleanup function 
-    return () => {
-      console.log('Index effect cleanup');
-      isMounted.current = false;
-    };
-  }, [isProfilesLoaded]);
-
-  // Set isMounted to true when component mounts
+  // Set isMounted to true when component mounts, clean up on unmount
   useEffect(() => {
     isMounted.current = true;
     return () => {
       isMounted.current = false;
     };
   }, []);
+  
+  // Force stop loading after a maximum wait time (fail-safe)
+  useEffect(() => {
+    const maxWaitTimer = setTimeout(() => {
+      if (isMounted.current && isLoadingInitial) {
+        console.log('Max wait time reached, forcing load completion');
+        setIsLoadingInitial(false);
+        initialLoadComplete.current = true;
+      }
+    }, 3000); // 3 second maximum wait
+    
+    return () => clearTimeout(maxWaitTimer);
+  }, [isLoadingInitial]);
+  
+  // Handle initial loading state with proper cleanup
+  useEffect(() => {
+    console.log('Index mounting with isProfilesLoaded:', isProfilesLoaded);
+    
+    if (isProfilesLoaded && !initialLoadComplete.current) {
+      // Use a short timeout to allow temperature data to load
+      const timer = setTimeout(() => {
+        if (isMounted.current) {
+          console.log('Setting isLoadingInitial to false');
+          setIsLoadingInitial(false);
+          initialLoadComplete.current = true;
+        }
+      }, 100); // Reduced timeout for faster render
+      
+      return () => clearTimeout(timer);
+    }
+    
+    return () => {
+      console.log('Index effect cleanup');
+    };
+  }, [isProfilesLoaded]);
 
   // Debug logs
   console.log('Index rendering with state:', {

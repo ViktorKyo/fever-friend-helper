@@ -21,12 +21,17 @@ root.render(
   </React.StrictMode>
 );
 
-// Global error handling
+// Global error handling with more details
 window.addEventListener('error', (event) => {
   console.error('Global error:', event.error);
+  console.error('Error message:', event.message);
+  console.error('Error source:', event.filename, 'line:', event.lineno, 'col:', event.colno);
 });
 
 // Add React error reporting
 window.addEventListener('unhandledrejection', (event) => {
   console.error('Unhandled Promise Rejection:', event.reason);
 });
+
+// Log successful initialization
+console.log('Application initialized successfully');

@@ -20,33 +20,30 @@ export function useTemperatures(selectedProfileId: string | null, isProfilesLoad
     try {
       console.log("Loading temperatures from localStorage for profile", selectedProfileId);
       
-      // Add timeout to ensure state updates properly
-      setTimeout(() => {
-        // Load temperatures
-        let loadedTemperatures: TemperatureReading[] = [];
-        const savedTemperatures = localStorage.getItem(LOCAL_STORAGE_TEMPS_KEY);
-        
-        if (savedTemperatures) {
-          try {
-            const parsedTemperatures = JSON.parse(savedTemperatures);
-            loadedTemperatures = parsedTemperatures.map((temp: any) => ({
-              ...temp,
-              timestamp: new Date(temp.timestamp)
-            }));
-          } catch (parseError) {
-            console.error("Error parsing temperatures:", parseError);
-            loadedTemperatures = generateMockReadings(selectedProfileId);
-          }
-        } else {
+      // Load temperatures immediately without setTimeout
+      let loadedTemperatures: TemperatureReading[] = [];
+      const savedTemperatures = localStorage.getItem(LOCAL_STORAGE_TEMPS_KEY);
+      
+      if (savedTemperatures) {
+        try {
+          const parsedTemperatures = JSON.parse(savedTemperatures);
+          loadedTemperatures = parsedTemperatures.map((temp: any) => ({
+            ...temp,
+            timestamp: new Date(temp.timestamp)
+          }));
+        } catch (parseError) {
+          console.error("Error parsing temperatures:", parseError);
           loadedTemperatures = generateMockReadings(selectedProfileId);
-          // Save mock data to localStorage
-          localStorage.setItem(LOCAL_STORAGE_TEMPS_KEY, JSON.stringify(loadedTemperatures));
         }
-        
-        console.log("Loaded temperatures:", loadedTemperatures);
-        setTemperatures(loadedTemperatures);
-        setIsLoaded(true);
-      }, 100);
+      } else {
+        loadedTemperatures = generateMockReadings(selectedProfileId);
+        // Save mock data to localStorage
+        localStorage.setItem(LOCAL_STORAGE_TEMPS_KEY, JSON.stringify(loadedTemperatures));
+      }
+      
+      console.log("Loaded temperatures:", loadedTemperatures);
+      setTemperatures(loadedTemperatures);
+      setIsLoaded(true);
     } catch (e) {
       console.error('Error initializing temperatures:', e);
       setError("Failed to load temperature data. Using default values.");

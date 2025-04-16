@@ -25,39 +25,37 @@ export function useProfiles() {
     try {
       console.log("Loading profiles from localStorage");
       
-      // Add timeout to ensure state updates properly
-      setTimeout(() => {
-        // Load profiles
-        let loadedProfiles: ChildProfileType[] = [];
-        const savedProfiles = localStorage.getItem(LOCAL_STORAGE_PROFILES_KEY);
-        
-        if (savedProfiles) {
-          try {
-            const parsedProfiles = JSON.parse(savedProfiles);
-            loadedProfiles = parsedProfiles.map((profile: any) => ({
-              ...profile,
-              birthdate: new Date(profile.birthdate)
-            }));
-          } catch (parseError) {
-            console.error("Error parsing profiles:", parseError);
-            loadedProfiles = [createDefaultProfile()];
-          }
-        } else {
+      // Load profiles immediately without setTimeout
+      let loadedProfiles: ChildProfileType[] = [];
+      const savedProfiles = localStorage.getItem(LOCAL_STORAGE_PROFILES_KEY);
+      
+      if (savedProfiles) {
+        try {
+          const parsedProfiles = JSON.parse(savedProfiles);
+          loadedProfiles = parsedProfiles.map((profile: any) => ({
+            ...profile,
+            birthdate: new Date(profile.birthdate)
+          }));
+        } catch (parseError) {
+          console.error("Error parsing profiles:", parseError);
           loadedProfiles = [createDefaultProfile()];
-          // Save default profile to localStorage
-          localStorage.setItem(LOCAL_STORAGE_PROFILES_KEY, JSON.stringify(loadedProfiles));
         }
-        
-        console.log("Loaded profiles:", loadedProfiles);
-        setProfiles(loadedProfiles);
-        
-        // If profiles exist, select the first one
-        if (loadedProfiles.length > 0) {
-          setSelectedProfileId(loadedProfiles[0].id);
-        }
-        
-        setIsLoaded(true);
-      }, 100);
+      } else {
+        loadedProfiles = [createDefaultProfile()];
+        // Save default profile to localStorage
+        localStorage.setItem(LOCAL_STORAGE_PROFILES_KEY, JSON.stringify(loadedProfiles));
+      }
+      
+      console.log("Loaded profiles:", loadedProfiles);
+      setProfiles(loadedProfiles);
+      
+      // If profiles exist, select the first one
+      if (loadedProfiles.length > 0) {
+        setSelectedProfileId(loadedProfiles[0].id);
+      }
+      
+      // Always mark as loaded, even if there was an error
+      setIsLoaded(true);
     } catch (e) {
       console.error('Error initializing profiles:', e);
       setError("Failed to load profiles. Using default values.");
