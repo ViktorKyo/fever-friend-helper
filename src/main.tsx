@@ -11,10 +11,15 @@ if (!rootElement) {
   throw new Error('Fatal: Root element not found');
 }
 
+// Stabilize rendering by creating root once
 const root = createRoot(rootElement);
 
-// Render the app once without any async behavior
-root.render(<App />);
+// Wrap in StrictMode for better development experience
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
 
 // Handle unhandled errors
 window.addEventListener('error', (event) => {

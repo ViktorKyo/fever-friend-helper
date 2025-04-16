@@ -12,12 +12,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   
   return (
-    <div className="flex flex-col min-h-[100dvh] w-full bg-background">
-      <main className="flex-1 container mx-auto px-4 pt-4 pb-20 overflow-y-auto">
+    <div className="flex flex-col min-h-[100dvh] bg-background">
+      <main className="flex-1 container mx-auto px-4 pt-4 pb-20 overflow-auto">
         {children}
       </main>
       
-      <nav className="fixed bottom-0 left-0 w-full bg-background border-t border-border py-2 z-50">
+      <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border py-2 z-40">
         <div className="container mx-auto">
           <ul className="flex justify-around items-center">
             <li>

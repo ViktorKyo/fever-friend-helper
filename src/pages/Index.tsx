@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Layout from '@/components/Layout';
 import { useProfiles } from '@/hooks/useProfiles';
 import { useTemperatures } from '@/hooks/useTemperatures';
@@ -10,7 +10,8 @@ import ProfileSection from '@/components/ProfileSection';
 import MainContent from '@/components/MainContent';
 
 const Index = () => {
-  // Use more stable state approach with loading
+  // Prevent unmounting with ref
+  const initialLoadComplete = useRef(false);
   const [isLoadingInitial, setIsLoadingInitial] = useState(true);
   
   // Use our custom hooks for state management
@@ -37,27 +38,21 @@ const Index = () => {
   
   // Set loading state with a more reliable approach
   useEffect(() => {
-    console.log('Index mounting', { isProfilesLoaded });
-    let mounted = true;
+    console.log('Index mounting with isProfilesLoaded:', isProfilesLoaded);
     
-    if (isProfilesLoaded) {
-      // Add a slightly longer delay to ensure data is properly loaded
+    if (isProfilesLoaded && !initialLoadComplete.current) {
+      // Use shorter timeout and ref to prevent repeated loading states
       const timer = setTimeout(() => {
-        if (mounted) {
-          setIsLoadingInitial(false);
-          console.log('Index finished loading - showing content');
-        }
-      }, 1000);
+        console.log('Setting isLoadingInitial to false');
+        setIsLoadingInitial(false);
+        initialLoadComplete.current = true;
+      }, 500);
       
-      return () => {
-        mounted = false;
-        clearTimeout(timer);
-      };
+      return () => clearTimeout(timer);
     }
     
     return () => {
-      mounted = false;
-      console.log('Index unmounting');
+      console.log('Index effect cleanup');
     };
   }, [isProfilesLoaded]);
 
